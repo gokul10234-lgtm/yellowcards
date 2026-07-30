@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YellowCards — Compare UAE Credit Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --yellow:#FFC933;
+    --yellow-deep:#F0A400;
+    --ink:#1C1C1E;
+    --grey-700:#4A4A4F;
+    --grey-400:#8A8A90;
+    --grey-200:#E7E6E2;
+    --grey-100:#F5F5F2;
+    --white:#FFFFFF;
+    --radius:14px;
+    --shadow:0 10px 30px -12px rgba(28,28,30,0.18);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:var(--white);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Sora',sans-serif;
+    letter-spacing:-0.02em;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;}
+  img{max-width:100%;}
+
+  /* ===== Nav ===== */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 5vw;
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--grey-200);
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-family:'Sora',sans-serif; font-weight:800; font-size:20px;}
+  .brand-mark{
+    width:34px; height:24px; border-radius:6px;
+    background:linear-gradient(135deg,var(--yellow),var(--yellow-deep));
+    position:relative; box-shadow:var(--shadow);
+  }
+  .brand-mark::after{
+    content:""; position:absolute; left:5px; top:9px; width:16px; height:3px; border-radius:2px; background:var(--ink); opacity:.75;
+  }
+  .nav-links{display:flex; gap:28px; font-weight:600; font-size:14.5px;}
+  .nav-links a{text-decoration:none; color:var(--grey-700); cursor:pointer; transition:color .15s;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a.active{color:var(--ink); border-bottom:2px solid var(--yellow); padding-bottom:4px;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ===== Hero ===== */
+  .hero{
+    padding:64px 5vw 40px;
+    display:grid; grid-template-columns:1.05fr 0.95fr; gap:40px;
+    align-items:center;
+    max-width:1320px; margin:0 auto;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--grey-100); border:1px solid var(--grey-200);
+    padding:6px 12px; border-radius:100px; font-size:12.5px; font-weight:600; color:var(--grey-700);
+    margin-bottom:18px;
+  }
+  .eyebrow::before{content:""; width:7px; height:7px; border-radius:50%; background:var(--yellow-deep);}
+  .hero h1{
+    font-size:clamp(34px,4.4vw,54px);
+    line-height:1.04; font-weight:800; margin:0 0 18px;
+  }
+  .hero h1 .hl{
+    background:linear-gradient(180deg,transparent 62%, var(--yellow) 62%);
+  }
+  .hero p{
+    font-size:17px; color:var(--grey-700); line-height:1.6; max-width:480px; margin:0 0 28px;
+  }
+  .search-row{display:flex; gap:10px; max-width:480px;}
+  .search-row input{
+    flex:1; padding:14px 16px; border-radius:10px; border:1.5px solid var(--grey-200);
+    font-size:15px; font-family:'Inter',sans-serif; outline:none; transition:border-color .15s;
+  }
+  .search-row input:focus{border-color:var(--yellow-deep);}
+  .btn{
+    border:none; cursor:pointer; font-family:'Sora',sans-serif; font-weight:700;
+    border-radius:10px; padding:14px 22px; font-size:14.5px; transition:transform .12s, box-shadow .12s;
+  }
+  .btn-primary{background:var(--ink); color:var(--white);}
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 8px 20px -8px rgba(28,28,30,.4);}
+  .stat-row{display:flex; gap:30px; margin-top:34px;}
+  .stat-row div b{display:block; font-family:'Sora',sans-serif; font-size:22px; font-weight:800;}
+  .stat-row div span{font-size:12.5px; color:var(--grey-400); font-weight:600;}
+
+  /* Signature: fanned card deck */
+  .deck{
+    position:relative; height:380px; display:flex; align-items:center; justify-content:center;
+  }
+  .fan-card{
+    position:absolute; width:230px; height:145px; border-radius:16px;
+    box-shadow:var(--shadow); padding:18px;
+    display:flex; flex-direction:column; justify-content:space-between;
+    color:var(--white); font-family:'Sora',sans-serif;
+    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+    border:1px solid rgba(255,255,255,.14);
+  }
+  .fan-card .fc-top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .fan-card .fc-bank{font-size:11.5px; font-weight:600; opacity:.85; letter-spacing:.02em;}
+  .fan-card .fc-chip{width:28px; height:20px; border-radius:4px; background:rgba(255,255,255,.35);}
+  .fan-card .fc-num{font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:.12em; opacity:.9;}
+  .fan-card .fc-name{font-size:13px; font-weight:700;}
+  .deck:hover .fan-card{transform:var(--hover-tf, none);}
+  .fc1{background:linear-gradient(135deg,#2B2B2E,#1C1C1E); transform:rotate(-14deg) translate(-90px,10px); z-index:1;}
+  .fc2{background:linear-gradient(135deg,#F0A400,#FFC933); color:#1C1C1E; transform:rotate(-4deg) translate(-20px,-8px); z-index:2;}
+  .fc2 .fc-chip{background:rgba(28,28,30,.25);}
+  .fc3{background:linear-gradient(135deg,#4A4A4F,#2B2B2E); transform:rotate(6deg) translate(50px,4px); z-index:3;}
+  .fc4{background:linear-gradient(135deg,#1C1C1E,#3a3a3d); transform:rotate(16deg) translate(120px,20px); z-index:4;}
+  .deck:hover .fc1{transform:rotate(-14deg) translate(-150px,10px);}
+  .deck:hover .fc2{transform:rotate(-4deg) translate(-55px,-16px);}
+  .deck:hover .fc3{transform:rotate(6deg) translate(75px,-4px);}
+  .deck:hover .fc4{transform:rotate(16deg) translate(165px,24px);}
+
+  /* ===== Filter bar ===== */
+  .section{padding:20px 5vw; max-width:1320px; margin:0 auto;}
+  .filter-bar{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    padding:16px 20px; background:var(--grey-100); border-radius:var(--radius);
+    margin-bottom:28px; border:1px solid var(--grey-200);
+  }
+  .chip{
+    padding:8px 15px; border-radius:100px; font-size:13.5px; font-weight:600;
+    background:var(--white); border:1.5px solid var(--grey-200); cursor:pointer;
+    transition:.15s; color:var(--grey-700); white-space:nowrap;
+  }
+  .chip:hover{border-color:var(--yellow-deep);}
+  .chip.active{background:var(--ink); color:var(--white); border-color:var(--ink);}
+  .filter-bar select{
+    margin-left:auto; padding:9px 12px; border-radius:10px; border:1.5px solid var(--grey-200);
+    font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; color:var(--grey-700); background:var(--white);
+  }
+
+  .section-title{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:18px;}
+  .section-title h2{font-size:24px; font-weight:800; margin:0;}
+  .section-title span{font-size:13.5px; color:var(--grey-400); font-weight:600;}
+
+  /* ===== Card grid ===== */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:18px; padding-bottom:60px;}
+  .card{
+    border:1.5px solid var(--grey-200); border-radius:var(--radius); padding:22px;
+    background:var(--white); transition:box-shadow .15s, transform .15s; position:relative;
+  }
+  .card:hover{box-shadow:var(--shadow); transform:translateY(-3px);}
+  .card-head{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+  .badge{
+    width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-family:'Sora',sans-serif; font-weight:800; font-size:14px; color:var(--white); flex-shrink:0;
+  }
+  .card-head .names{min-width:0;}
+  .card-head .bank{font-size:11.5px; font-weight:700; color:var(--grey-400); text-transform:uppercase; letter-spacing:.04em;}
+  .card-head .name{font-family:'Sora',sans-serif; font-weight:700; font-size:15.5px; line-height:1.25;}
+  .tag{
+    display:inline-block; font-size:11px; font-weight:700; padding:4px 10px; border-radius:100px;
+    background:var(--grey-100); color:var(--grey-700); margin-bottom:12px;
+  }
+  .card-stats{display:flex; gap:18px; margin:14px 0; padding:14px 0; border-top:1px solid var(--grey-200); border-bottom:1px solid var(--grey-200);}
+  .card-stats div b{display:block; font-family:'JetBrains Mono',monospace; font-size:14.5px; font-weight:600;}
+  .card-stats div span{font-size:11px; color:var(--grey-400); font-weight:600;}
+  .card-benefit{font-size:13.5px; color:var(--grey-700); line-height:1.5; margin-bottom:16px; min-height:40px;}
+  .card-foot{display:flex; align-items:center; justify-content:space-between;}
+  .compare-check{display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--grey-700); cursor:pointer;}
+  .compare-check input{width:16px; height:16px; accent-color:var(--yellow-deep); cursor:pointer;}
+  .detail-link{font-size:13px; font-weight:700; color:var(--ink); text-decoration:none; border-bottom:1.5px solid var(--yellow); cursor:pointer;}
+
+  /* ===== Compare tray ===== */
+  .tray{
+    position:fixed; bottom:0; left:0; right:0; z-index:60;
+    background:var(--ink); color:var(--white);
+    padding:16px 5vw; display:none; align-items:center; justify-content:space-between;
+    box-shadow:0 -10px 30px rgba(0,0,0,.2);
+  }
+  .tray.show{display:flex;}
+  .tray-left{display:flex; align-items:center; gap:14px; font-size:14px; font-weight:600;}
+  .tray-cards{display:flex; gap:8px;}
+  .tray-pill{background:rgba(255,255,255,.12); padding:6px 12px; border-radius:100px; font-size:12.5px; display:flex; align-items:center; gap:8px;}
+  .tray-pill button{background:none; border:none; color:var(--white); opacity:.6; cursor:pointer; font-size:14px;}
+  .tray button.btn-primary{background:var(--yellow); color:var(--ink);}
+
+  /* ===== Modal ===== */
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(28,28,30,.55); z-index:100;
+    display:none; align-items:center; justify-content:center; padding:24px;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:var(--white); border-radius:18px; max-width:1200px; width:100%; max-height:85vh; overflow:auto;
+    padding:30px;
+  }
+  .modal-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:22px;}
+  .modal-head h3{margin:0; font-size:20px;}
+  .modal-close{background:var(--grey-100); border:none; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px;}
+  table.compare-table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  table.compare-table th, table.compare-table td{padding:12px 14px; text-align:left; border-bottom:1px solid var(--grey-200); vertical-align:top; min-width:170px;}
+  table.compare-table th{font-family:'Sora',sans-serif; font-size:12.5px; color:var(--grey-400); text-transform:uppercase; letter-spacing:.03em;}
+  table.compare-table td.label, table.compare-table th.label{font-weight:700; color:var(--grey-700); white-space:nowrap; position:sticky; left:0; background:var(--white); min-width:130px;}
+  .compare-scroll{overflow-x:auto;}
+
+  /* ===== Footer ===== */
+  footer{padding:40px 5vw; border-top:1px solid var(--grey-200); text-align:center; color:var(--grey-400); font-size:13px;}
+
+  /* ===== Admin ===== */
+  .admin-wrap{max-width:520px; margin:80px auto; padding:0 20px;}
+  .admin-card{background:var(--grey-100); border:1px solid var(--grey-200); border-radius:var(--radius); padding:32px;}
+  .admin-card h2{margin-top:0;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12.5px; font-weight:700; color:var(--grey-700); margin-bottom:6px;}
+  .field input, .field select, .field textarea{
+    width:100%; padding:11px 13px; border-radius:9px; border:1.5px solid var(--grey-200); font-family:'Inter',sans-serif; font-size:14px; outline:none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--yellow-deep);}
+  .admin-error{color:#C0392B; font-size:13px; font-weight:600; margin-bottom:12px; display:none;}
+  .admin-dash{max-width:1200px; margin:40px auto; padding:0 5vw;}
+  .admin-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;}
+  .admin-table-wrap{overflow-x:auto; border:1px solid var(--grey-200); border-radius:var(--radius);}
+  table.admin-table{width:100%; border-collapse:collapse; font-size:13.5px; min-width:900px;}
+  table.admin-table th{background:var(--grey-100); text-align:left; padding:12px 14px; font-family:'Sora',sans-serif; font-size:11.5px; text-transform:uppercase; color:var(--grey-400);}
+  table.admin-table td{padding:12px 14px; border-top:1px solid var(--grey-200);}
+  .icon-btn{background:none; border:none; cursor:pointer; font-size:15px; padding:4px 6px; border-radius:6px;}
+  .icon-btn:hover{background:var(--grey-100);}
+  .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .form-grid .full{grid-column:1/-1;}
+  .save-note{font-size:12.5px; color:var(--grey-400); margin-top:6px;}
+  .loading{padding:40px; text-align:center; color:var(--grey-400); font-size:14px;}
+
+  /* ===== DBR calculator ===== */
+  .dbr-wrap{max-width:640px; margin:56px auto 80px; padding:0 20px;}
+  .dbr-intro{margin-bottom:28px;}
+  .dbr-intro h2{margin:0 0 10px;}
+  .dbr-intro p{color:var(--grey-700); font-size:15px; line-height:1.6; max-width:52ch;}
+  .dbr-card{background:var(--grey-100); border:1px solid var(--grey-200); border-radius:var(--radius); padding:32px;}
+  .input-wrap{position:relative;}
+  .input-wrap .prefix{position:absolute; left:14px; top:50%; transform:translateY(-50%); font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--grey-400); pointer-events:none;}
+  .input-wrap input{padding-left:50px !important;}
+  .field .hint{font-size:12px; color:var(--grey-400); margin-top:5px;}
+  .dbr-divider{height:1px; background:var(--grey-200); margin:26px 0;}
+  .dbr-result{border-radius:12px; padding:24px; background:var(--white); border:1px solid var(--grey-200); transition:background .25s, border-color .25s;}
+  .dbr-result.eligible{background:rgba(15,110,79,.06); border-color:rgba(15,110,79,.3);}
+  .dbr-result.not-eligible{background:rgba(192,57,43,.06); border-color:rgba(192,57,43,.3);}
+  .dbr-status-row{display:flex; align-items:center; gap:10px; margin-bottom:18px;}
+  .dbr-dot{width:10px; height:10px; border-radius:50%; background:var(--grey-400); flex-shrink:0;}
+  .dbr-result.eligible .dbr-dot{background:#0F6E4F;}
+  .dbr-result.not-eligible .dbr-dot{background:#C0392B;}
+  .dbr-status-text{font-family:'Sora',sans-serif; font-weight:700; font-size:16.5px;}
+  .dbr-result.eligible .dbr-status-text{color:#0F6E4F;}
+  .dbr-result.not-eligible .dbr-status-text{color:#C0392B;}
+  .dbr-metrics{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .dbr-metric .lbl{font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--grey-400); font-weight:700;}
+  .dbr-metric .val{font-family:'JetBrains Mono',monospace; font-size:19px; margin-top:5px;}
+  .dbr-bar-track{height:8px; border-radius:4px; background:var(--grey-200); overflow:hidden; margin-top:20px;}
+  .dbr-bar-fill{height:100%; border-radius:4px; background:#0F6E4F; width:0%; transition:width .5s ease, background .3s ease;}
+  .dbr-bar-fill.over{background:#C0392B;}
+  .dbr-bar-caption{display:flex; justify-content:space-between; margin-top:7px; font-size:11.5px; font-family:'JetBrains Mono',monospace; color:var(--grey-400);}
+  .dbr-cta{margin-top:22px;}
+  .dbr-cta a[disabled]{opacity:.4; pointer-events:none;}
+  .dbr-fine{margin-top:22px; font-size:12px; line-height:1.6; color:var(--grey-400);}
+
+  .admin-tabs{display:flex; gap:8px; margin:18px 0 20px;}
+  .admin-tab{padding:9px 16px; border-radius:100px; font-size:13.5px; font-weight:700; cursor:pointer; border:1.5px solid var(--grey-200); background:var(--white); color:var(--grey-700);}
+  .admin-tab:hover{border-color:var(--yellow-deep);}
+  .admin-tab.active{background:var(--ink); color:var(--white); border-color:var(--ink);}
+  .admin-panel{display:block;}
+  .status-pill{display:inline-block; padding:4px 10px; border-radius:100px; font-size:11px; font-weight:700; white-space:nowrap;}
+  .status-new{background:#EAF3FF; color:#1D4E89;}
+  .status-contacted{background:#FFF6DE; color:#8A6A2D;}
+  .status-followup{background:#FDEEE0; color:#B4531E;}
+  .status-converted{background:#E6F4EC; color:#0F6E4F;}
+  .status-lost{background:#FBEAEA; color:#C0392B;}
+  select.status-select{padding:6px 10px; border-radius:8px; border:1.5px solid var(--grey-200); font-family:'Inter',sans-serif; font-size:12px; font-weight:600; background:var(--white); color:var(--grey-700);}
+
+  .company-results{margin-top:18px; display:flex; flex-direction:column; gap:10px;}
+  .company-result-row{display:flex; align-items:center; justify-content:space-between; gap:14px; background:var(--white); border:1px solid var(--grey-200); border-radius:10px; padding:14px 16px;}
+  .company-result-row .bank-name{font-family:'Sora',sans-serif; font-weight:700; font-size:14.5px;}
+  .company-result-row .company-cat{font-size:12px; color:var(--grey-400); margin-top:2px;}
+  .company-cat-pill{font-size:11px; font-weight:700; padding:4px 10px; border-radius:100px; background:var(--grey-100); color:var(--grey-700); white-space:nowrap;}
+  .company-empty{padding:20px; text-align:center; color:var(--grey-400); font-size:13.5px; background:var(--white); border:1px dashed var(--grey-200); border-radius:10px; margin-top:18px;}
+  .company-hint-idle{padding:20px; text-align:center; color:var(--grey-400); font-size:13.5px;}
+
+  .whatsapp-fab{
+    position:fixed; right:24px; bottom:24px; z-index:55;
+    width:56px; height:56px; border-radius:50%;
+    background:#25D366; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 24px -8px rgba(37,211,102,.6);
+    text-decoration:none; transition:transform .15s;
+  }
+  .whatsapp-fab:hover{transform:scale(1.06);}
+  .whatsapp-fab svg{width:28px; height:28px; fill:#fff;}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr; padding-top:36px;}
+    .deck{height:280px; order:-1;}
+    .fan-card{width:190px; height:120px; padding:14px;}
+    .form-grid{grid-template-columns:1fr;}
+    .nav-links{gap:16px; font-size:13px;}
+  }
+</style>
+</head>
+<body>
+
+<a class="whatsapp-fab" href="https://wa.me/971527074559" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 2 3 4.8 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.9 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.2-8.4 8.2z"/></svg>
+</a>
+
+<nav class="nav">
+  <div class="brand"><div class="brand-mark"></div>YellowCards</div>
+  <div class="nav-links">
+    <a data-view="site" class="active">Compare</a>
+    <a data-view="dbr">DBR Calculator</a>
+    <a data-view="company">Company Check</a>
+  </div>
+</nav>
+
+<!-- ============ PUBLIC SITE ============ -->
+<div class="view active" id="view-site">
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">18 cards · 9 UAE banks</div>
+      <h1>Find the credit card that <span class="hl">actually pays you back.</span></h1>
+      <p>Compare cashback, rewards, travel and Shariah-compliant cards from the UAE's leading banks — fees, minimum salary and perks side by side.</p>
+      <div class="search-row">
+        <input type="text" id="heroSearch" placeholder="Search by bank, card name or benefit…">
+        <button class="btn btn-primary" onclick="document.getElementById('cardsSection').scrollIntoView({behavior:'smooth'})">Browse cards</button>
+      </div>
+      <div class="stat-row">
+        <div><b id="statCount">18</b><span>CARDS LISTED</span></div>
+        <div><b>9</b><span>BANKS COVERED</span></div>
+        <div><b>0 AED</b><span>CARDS FROM</span></div>
+      </div>
+    </div>
+    <div class="deck">
+      <div class="fan-card fc1"><div class="fc-top"><span class="fc-bank">EMIRATES NBD</span><div class="fc-chip"></div></div><div class="fc-num">•••• 4471</div><div class="fc-name">Skywards Signature</div></div>
+      <div class="fan-card fc2"><div class="fc-top"><span class="fc-bank">RAKBANK</span><div class="fc-chip"></div></div><div class="fc-num">•••• 8820</div><div class="fc-name">Cashback Plus</div></div>
+      <div class="fan-card fc3"><div class="fc-top"><span class="fc-bank">CBD</span><div class="fc-chip"></div></div><div class="fc-num">•••• 1156</div><div class="fc-name">Rewards World</div></div>
+      <div class="fan-card fc4"><div class="fc-top"><span class="fc-bank">ADCB</span><div class="fc-chip"></div></div><div class="fc-num">•••• 9903</div><div class="fc-name">Traveller Elite</div></div>
+    </div>
+  </div>
+
+  <div class="section" id="cardsSection">
+    <div class="filter-bar" id="filterBar">
+      <div class="chip active" data-cat="all">All cards</div>
+      <div class="chip" data-cat="Cashback">Cashback</div>
+      <div class="chip" data-cat="Travel & Miles">Travel & Miles</div>
+      <div class="chip" data-cat="Rewards">Rewards</div>
+      <div class="chip" data-cat="Islamic">Islamic</div>
+      <div class="chip" data-cat="No Annual Fee">No Annual Fee</div>
+      <div class="chip" data-cat="Premium">Premium</div>
+      <select id="bankFilter"><option value="all">All banks</option></select>
+      <div class="chip" style="border-style:dashed;" onclick="selectAllVisible()">Select all visible</div>
+    </div>
+
+    <div class="section-title">
+      <h2>Compare cards</h2>
+      <span id="resultCount">18 results</span>
+    </div>
+
+    <div class="grid" id="cardGrid"></div>
+  </div>
+
+  <footer>
+    YellowCards — an independent comparison tool. Rates and offers shown are illustrative; always confirm current terms with the issuing bank before applying.
+    <div style="margin-top:14px; display:flex; gap:18px; align-items:center; justify-content:center; flex-wrap:wrap;">
+      <a href="https://wa.me/971527074559" target="_blank" rel="noopener" style="font-weight:700; color:var(--grey-700); text-decoration:none; border-bottom:1.5px solid var(--yellow); cursor:pointer;">WhatsApp us: +971 52 707 4559</a>
+      <a data-view="admin" style="font-weight:700; color:var(--grey-700); text-decoration:none; border-bottom:1.5px solid var(--grey-200); cursor:pointer;">Admin</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ============ DBR CALCULATOR ============ -->
+<div class="view" id="view-dbr">
+  <div class="dbr-wrap">
+    <div class="dbr-intro">
+      <div class="eyebrow">Eligibility check</div>
+      <h2>What's your debt burden ratio?</h2>
+      <p>Enter your salary and existing obligations to estimate your DBR and how much additional credit card limit you're likely eligible for.</p>
+    </div>
+
+    <div class="dbr-card">
+      <div class="field">
+        <label>Monthly salary</label>
+        <div class="input-wrap">
+          <span class="prefix">AED</span>
+          <input id="dbrSalary" type="number" inputmode="numeric" placeholder="8,000" min="0">
+        </div>
+        <div class="hint">Gross monthly salary as shown on your salary certificate / bank statement.</div>
+      </div>
+
+      <div class="field">
+        <label>Total existing credit card limit</label>
+        <div class="input-wrap">
+          <span class="prefix">AED</span>
+          <input id="dbrCardLimit" type="number" inputmode="numeric" placeholder="15,000" min="0">
+        </div>
+        <div class="hint">Sum of credit limits across all cards you currently hold. Leave blank if none.</div>
+      </div>
+
+      <div class="field">
+        <label>Other monthly EMI</label>
+        <div class="input-wrap">
+          <span class="prefix">AED</span>
+          <input id="dbrOtherEmi" type="number" inputmode="numeric" placeholder="1,200" min="0">
+        </div>
+        <div class="hint">Car loan, personal loan, or any other fixed monthly installment. Leave blank if none.</div>
+      </div>
+
+      <div class="field">
+        <label>Your name (optional)</label>
+        <input id="dbrName" type="text" placeholder="So I can follow up with your result">
+      </div>
+
+      <div class="field">
+        <label>Company name (optional)</label>
+        <input id="dbrCompany" type="text" placeholder="e.g. Emirates Group">
+      </div>
+
+      <div class="field">
+        <label>Mobile number (optional)</label>
+        <input id="dbrPhone" type="tel" placeholder="05X XXX XXXX">
+      </div>
+
+      <div class="dbr-divider"></div>
+
+      <div id="dbrResult" class="dbr-result">
+        <div class="dbr-status-row">
+          <span class="dbr-dot"></span>
+          <span class="dbr-status-text" id="dbrStatusText">Enter your details to check eligibility</span>
+        </div>
+        <div class="dbr-metrics">
+          <div class="dbr-metric"><div class="lbl">Debt burden ratio</div><div class="val" id="dbrPercent">—</div></div>
+          <div class="dbr-metric"><div class="lbl">Est. new card limit</div><div class="val" id="dbrNewLimit">—</div></div>
+        </div>
+        <div class="dbr-bar-track"><div class="dbr-bar-fill" id="dbrBarFill"></div></div>
+        <div class="dbr-bar-caption"><span>0%</span><span>50% cap</span><span>100%</span></div>
+      </div>
+
+      <div class="dbr-cta">
+        <a id="dbrWaBtn" class="btn btn-primary" href="#" target="_blank" rel="noopener" disabled>Send to WhatsApp for review →</a>
+      </div>
+
+      <p class="dbr-fine">Estimate only, based on a standard 50% debt burden ratio cap and 5% minimum payment on card limits — actual bank policies vary by issuer. I'll confirm your exact eligibility once I review your salary certificate and bank statement.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ COMPANY CHECK ============ -->
+<div class="view" id="view-company">
+  <div class="dbr-wrap">
+    <div class="dbr-intro">
+      <div class="eyebrow">Employer check</div>
+      <h2>Is your company listed with a bank?</h2>
+      <p>Banks maintain approved employer lists that affect your credit card eligibility and terms. Search your company name to see which banks currently list it.</p>
+    </div>
+
+    <div class="dbr-card">
+      <div class="field">
+        <label>Company name</label>
+        <input id="companySearch" type="text" placeholder="Start typing your employer's name…" autocomplete="off">
+      </div>
+      <div id="companyResults" class="company-results"></div>
+      <p class="dbr-fine">Listings are maintained manually and may not cover every employer — if your company isn't shown, WhatsApp me and I'll confirm directly with the bank.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Compare tray -->
+<div class="tray" id="tray">
+  <div class="tray-left">
+    <span id="trayCount">0 selected</span>
+    <div class="tray-cards" id="trayCards"></div>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button class="btn" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);" onclick="clearCompare()">Clear</button>
+    <button class="btn btn-primary" onclick="openCompare()">Compare now</button>
+  </div>
+</div>
+
+<!-- Compare modal -->
+<div class="modal-bg" id="compareModal">
+  <div class="modal">
+    <div class="modal-head"><h3>Side-by-side comparison</h3><button class="modal-close" onclick="closeCompare()">✕</button></div>
+    <div id="compareTableWrap"></div>
+  </div>
+</div>
+
+<!-- Card detail modal -->
+<div class="modal-bg" id="detailModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-head"><h3 id="detailTitle">Card</h3><button class="modal-close" onclick="closeDetail()">✕</button></div>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<!-- ============ ADMIN ============ -->
+<div class="view" id="view-admin">
+  <div class="admin-wrap" id="adminLoginWrap">
+    <a data-view="site" style="font-size:13px; font-weight:700; color:var(--grey-700); text-decoration:none; cursor:pointer;">← Back to site</a>
+    <div class="admin-card" style="margin-top:16px;">
+      <h2>Admin sign in</h2>
+      <div class="admin-error" id="loginError">Incorrect username or password.</div>
+      <div class="field"><label>Username</label><input type="text" id="loginUser" autocomplete="username"></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPass" autocomplete="current-password"></div>
+      <button class="btn btn-primary" style="width:100%;" onclick="tryLogin()">Sign in</button>
+    </div>
+  </div>
+
+  <div class="admin-dash" id="adminDash" style="display:none;">
+    <div class="admin-top">
+      <h2 style="margin:0;">Manage</h2>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a data-view="site" style="font-size:13px; font-weight:700; color:var(--grey-700); text-decoration:none; cursor:pointer; margin-right:6px;">← Back to site</a>
+        <button class="btn" style="background:var(--grey-100);" onclick="logoutAdmin()">Log out</button>
+      </div>
+    </div>
+
+    <div class="admin-tabs">
+      <div class="admin-tab active" data-admintab="cards">Cards</div>
+      <div class="admin-tab" data-admintab="leads">Leads (CRM)</div>
+      <div class="admin-tab" data-admintab="companies">Companies</div>
+    </div>
+
+    <div class="admin-panel" id="panel-cards">
+      <div class="admin-top" style="margin-bottom:16px;">
+        <span></span>
+        <button class="btn btn-primary" onclick="openEditForm(null)">+ Add card</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Bank</th><th>Card name</th><th>Category</th><th>Annual fee</th><th>Min. salary</th><th>Key benefit</th><th></th></tr></thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="panel-leads" style="display:none;">
+      <div class="admin-top" style="margin-bottom:16px;">
+        <span id="leadStatCount" class="mono" style="font-size:13px; color:var(--grey-700);">0 leads</span>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <select id="leadStatusFilter" style="padding:9px 12px; border-radius:10px; border:1.5px solid var(--grey-200); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; color:var(--grey-700); background:var(--white);">
+            <option value="all">All statuses</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="followup">Follow-up</option>
+            <option value="converted">Converted</option>
+            <option value="lost">Lost</option>
+          </select>
+          <button class="btn btn-primary" onclick="openLeadForm(null)">+ Add lead</button>
+        </div>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Name</th><th>Company</th><th>Phone</th><th>Salary</th><th>DBR</th><th>Status</th><th>Notes</th><th>Added</th><th></th></tr></thead>
+          <tbody id="leadsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="panel-companies" style="display:none;">
+      <div class="admin-top" style="margin-bottom:16px;">
+        <span id="companyStatCount" class="mono" style="font-size:13px; color:var(--grey-700);">0 listings</span>
+        <button class="btn btn-primary" onclick="openCompanyForm(null)">+ Add listing</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Company</th><th>Bank</th><th>Category</th><th>Notes</th><th></th></tr></thead>
+          <tbody id="companiesTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/edit company listing modal -->
+  <div class="modal-bg" id="companyModal">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-head"><h3 id="companyModalTitle">Add listing</h3><button class="modal-close" onclick="closeCompanyForm()">✕</button></div>
+      <div class="form-grid">
+        <div class="field full"><label>Company name</label><input id="co_company" placeholder="e.g. Emirates Group"></div>
+        <div class="field"><label>Bank</label><input id="co_bank" placeholder="e.g. Emirates NBD"></div>
+        <div class="field"><label>Category</label>
+          <select id="co_category">
+            <option value="Category A">Category A</option>
+            <option value="Category B">Category B</option>
+            <option value="Category C">Category C</option>
+            <option value="Listed">Listed (no tier)</option>
+            <option value="Not listed">Not listed</option>
+          </select>
+        </div>
+        <div class="field full"><label>Notes</label><input id="co_notes" placeholder="e.g. Min. salary AED 8,000 for this employer"></div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+        <button class="btn" style="background:var(--grey-100);" onclick="closeCompanyForm()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCompanyForm()">Save listing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/edit lead modal -->
+  <div class="modal-bg" id="leadModal">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-head"><h3 id="leadModalTitle">Add lead</h3><button class="modal-close" onclick="closeLeadForm()">✕</button></div>
+      <div class="form-grid">
+        <div class="field"><label>Name</label><input id="l_name" placeholder="e.g. Ahmed Khan"></div>
+        <div class="field"><label>Company name</label><input id="l_company" placeholder="e.g. Emirates Group"></div>
+        <div class="field"><label>Phone</label><input id="l_phone" placeholder="05X XXX XXXX"></div>
+        <div class="field"><label>Monthly salary (AED)</label><input id="l_salary" type="number" min="0"></div>
+        <div class="field"><label>Status</label>
+          <select id="l_status">
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="followup">Follow-up</option>
+            <option value="converted">Converted</option>
+            <option value="lost">Lost</option>
+          </select>
+        </div>
+        <div class="field full"><label>Notes</label><textarea id="l_notes" rows="3" placeholder="e.g. Interested in a travel card, prefers Islamic finance"></textarea></div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+        <button class="btn" style="background:var(--grey-100);" onclick="closeLeadForm()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveLeadForm()">Save lead</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/edit form modal -->
+  <div class="modal-bg" id="editModal">
+    <div class="modal" style="max-width:600px;">
+      <div class="modal-head"><h3 id="editModalTitle">Add card</h3><button class="modal-close" onclick="closeEditForm()">✕</button></div>
+      <div class="form-grid">
+        <div class="field"><label>Bank</label><input id="f_bank" placeholder="e.g. Mashreq"></div>
+        <div class="field"><label>Card name</label><input id="f_name" placeholder="e.g. Platinum Cashback"></div>
+        <div class="field">
+          <label>Category</label>
+          <select id="f_category">
+            <option>Cashback</option><option>Travel & Miles</option><option>Rewards</option>
+            <option>Islamic</option><option>No Annual Fee</option><option>Premium</option>
+          </select>
+        </div>
+        <div class="field"><label>Badge colour</label>
+          <select id="f_color">
+            <option value="#1C1C1E">Ink</option><option value="#F0A400">Yellow</option>
+            <option value="#4A4A4F">Grey</option><option value="#0F6E4F">Green</option>
+            <option value="#1D4E89">Blue</option><option value="#8B3A62">Plum</option>
+          </select>
+        </div>
+        <div class="field"><label>Annual fee (AED, 0 = free)</label><input id="f_fee" type="number" min="0"></div>
+        <div class="field"><label style="display:flex; align-items:center; gap:8px; margin-top:24px;"><input id="f_firstYearFree" type="checkbox" style="width:auto;"> Fee waived in year 1</label></div>
+        <div class="field"><label>Min. monthly salary (AED)</label><input id="f_salary" type="number" min="0"></div>
+        <div class="field full"><label>Cashback / rewards rate (short text)</label><input id="f_rate" placeholder="e.g. up to 6% cashback"></div>
+        <div class="field full"><label>Key benefit (one line)</label><textarea id="f_benefit" rows="2" placeholder="e.g. 6% cashback on dining and groceries, capped at AED 300/month"></textarea></div>
+        <div class="field full"><label>Welcome offer</label><input id="f_welcome" placeholder="e.g. AED 250 cashback on first AED 3,000 spend"></div>
+        <div class="field"><label>Foreign transaction fee</label><input id="f_forex" placeholder="e.g. 2.50%"></div>
+        <div class="field"><label>Lounge access</label><input id="f_lounge" placeholder="e.g. 4 visits/year or Not included"></div>
+        <div class="field"><label>Interest / profit rate</label><input id="f_apr" placeholder="e.g. 3.25% per month"></div>
+        <div class="field"><label>Redemption</label><input id="f_redemption" placeholder="e.g. Redeemable for flights and vouchers"></div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+        <button class="btn" style="background:var(--grey-100);" onclick="closeEditForm()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCardForm()">Save card</button>
+      </div>
+      <div class="save-note" id="saveNote"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ Data ============ */
+const DEFAULT_CARDS = [
+  {id:'c1', bank:'Emirates NBD', name:'Skywards Signature', category:'Travel & Miles', fee:1575, firstYearFree:true, salary:15000, rate:'2 Miles / AED 3', benefit:'Earn Skywards Miles on every spend with airport lounge access worldwide.', color:'#1C1C1E', welcome:'10,000 bonus Skywards Miles on first spend within 60 days.', forex:'2.10%', lounge:'8 complimentary visits/year via Dragon Pass', apr:'3.25% per month', redemption:'Redeem Miles directly for Emirates flight tickets and upgrades'},
+  {id:'c2', bank:'RAKBank', name:'Cashback Plus', category:'Cashback', fee:0, salary:5000, rate:'up to 5% cashback', benefit:'Flat cashback on fuel, groceries and utilities with no annual fee.', color:'#F0A400', welcome:'AED 250 cashback when you spend AED 3,000 in month one.', forex:'2.75%', lounge:'Not included', apr:'3.49% per month', redemption:'Cashback auto-credited to statement monthly, no minimum threshold'},
+  {id:'c3', bank:'CBD', name:'Rewards World', category:'Rewards', fee:525, firstYearFree:true, salary:8000, rate:'3x points on dining', benefit:'Accelerated rewards points on dining and international spend.', color:'#4A4A4F', welcome:'5,000 bonus points on card activation.', forex:'2.50%', lounge:'4 complimentary visits/year', apr:'3.35% per month', redemption:'Points redeemable for vouchers, air miles or statement credit'},
+  {id:'c4', bank:'ADCB', name:'Traveller Elite', category:'Travel & Miles', fee:1050, firstYearFree:true, salary:20000, rate:'4 Miles / AED 3', benefit:'Complimentary travel insurance and 12 lounge visits a year.', color:'#1D4E89', welcome:'Complimentary companion ticket on first international spend of AED 5,000.', forex:'1.99%', lounge:'12 complimentary visits/year via Priority Pass', apr:'3.15% per month', redemption:'Transfer Miles to major airline and hotel loyalty programmes'},
+  {id:'c5', bank:'Mashreq', name:'Salary Platinum', category:'No Annual Fee', fee:0, salary:5000, rate:'1% cashback', benefit:'Zero annual fee for salary transfer customers with instant approval.', color:'#0F6E4F', welcome:'AED 100 credit on first purchase.', forex:'2.99%', lounge:'Not included', apr:'3.55% per month', redemption:'Cashback credited automatically each statement cycle'},
+  {id:'c6', bank:'FAB', name:'Cashback Select', category:'Cashback', fee:315, salary:8000, rate:'up to 6% cashback', benefit:'6% cashback on supermarkets and dining, capped monthly.', color:'#8B3A62', welcome:'AED 300 cashback on spend of AED 5,000 in first 60 days.', forex:'2.62%', lounge:'2 complimentary visits/year', apr:'3.40% per month', redemption:'Cashback capped at AED 300/month, credited to statement'},
+  {id:'c7', bank:'HSBC', name:'Premier World Elite', category:'Premium', fee:2100, firstYearFree:true, salary:35000, rate:'unlimited lounge access', benefit:'Concierge service, golf privileges and unlimited airport lounge access.', color:'#1C1C1E', welcome:'50,000 reward points on spend of AED 10,000 in first 90 days.', forex:'1.75%', lounge:'Unlimited visits via Priority Pass, plus guest access', apr:'2.99% per month', redemption:'Points redeemable for flights, hotels or transferred to airline partners'},
+  {id:'c8', bank:'Aafaq Islamic Finance', name:'Barakah Cashback', category:'Islamic', fee:0, salary:5000, rate:'up to 4% cashback', benefit:'Shariah-compliant cashback card with no hidden profit charges.', color:'#0F6E4F', welcome:'AED 150 cashback on first AED 2,000 spend.', forex:'2.80%', lounge:'Not included', apr:'Profit rate 3.10% per month (Shariah-compliant)', redemption:'Cashback credited monthly, no minimum spend required'},
+  {id:'c9', bank:'Mawarid Finance', name:'Noor Rewards', category:'Islamic', fee:315, salary:7000, rate:'2x reward points', benefit:'Islamic finance rewards card redeemable across UAE retail partners.', color:'#0F6E4F', welcome:'3,000 bonus points on first purchase.', forex:'2.65%', lounge:'2 complimentary visits/year', apr:'Profit rate 3.20% per month (Shariah-compliant)', redemption:'Points redeemable at partner retailers and for statement credit'},
+  {id:'c10', bank:'UAB', name:'Smart Saver', category:'No Annual Fee', fee:0, salary:4000, rate:'0.5% cashback', benefit:'Entry-level card with no annual fee and instant e-card issuance.', color:'#4A4A4F', welcome:'AED 50 credit on account activation.', forex:'3.00%', lounge:'Not included', apr:'3.60% per month', redemption:'Cashback credited quarterly to statement'},
+  {id:'c11', bank:'Emirates NBD', name:'Cashback Titanium', category:'Cashback', fee:0, salary:5000, rate:'up to 3% cashback', benefit:'No annual fee cashback card with dining and fuel rewards.', color:'#1C1C1E', welcome:'AED 200 cashback on spend of AED 3,000 in month one.', forex:'2.75%', lounge:'Not included', apr:'3.45% per month', redemption:'Cashback auto-credited monthly, no cap on dining category'},
+  {id:'c12', bank:'ADCB', name:'Lulu Titanium', category:'Cashback', fee:299, salary:5000, rate:'up to 10% at Lulu', benefit:'Extra rewards on Lulu Hypermarket and everyday grocery spend.', color:'#1D4E89', welcome:'AED 100 Lulu voucher on first grocery spend.', forex:'2.70%', lounge:'Not included', apr:'3.40% per month', redemption:'Cashback capped at AED 200/month on Lulu spend'},
+  {id:'c13', bank:'RAKBank', name:'World Traveller', category:'Travel & Miles', fee:840, salary:15000, rate:'3 Miles / AED 3', benefit:'Airline mile transfers with complimentary travel insurance.', color:'#F0A400', welcome:'8,000 bonus Miles on first international transaction.', forex:'2.05%', lounge:'6 complimentary visits/year', apr:'3.25% per month', redemption:'Miles transferable to Emirates Skywards and Etihad Guest'},
+  {id:'c14', bank:'CBD', name:'Islamic Rewards', category:'Islamic', fee:210, salary:6000, rate:'2x points', benefit:'Shariah-compliant rewards on all retail and online spend.', color:'#4A4A4F', welcome:'2,500 bonus points on card issuance.', forex:'2.60%', lounge:'Not included', apr:'Profit rate 3.15% per month (Shariah-compliant)', redemption:'Points redeemable for vouchers and online shopping partners'},
+  {id:'c15', bank:'Mashreq', name:'World Elite', category:'Premium', fee:1890, firstYearFree:true, salary:30000, rate:'unlimited lounge access', benefit:'Priority Pass membership and premium travel concierge.', color:'#0F6E4F', welcome:'40,000 bonus points on spend of AED 8,000 in first 90 days.', forex:'1.85%', lounge:'Unlimited visits via Priority Pass', apr:'3.05% per month', redemption:'Points redeemable for flights, hotels and premium merchandise'},
+  {id:'c16', bank:'FAB', name:'Zero Fee Classic', category:'No Annual Fee', fee:0, salary:4000, rate:'0.5% cashback', benefit:'Simple, fee-free card ideal for first-time cardholders.', color:'#8B3A62', welcome:'AED 75 credit on first purchase.', forex:'2.95%', lounge:'Not included', apr:'3.50% per month', redemption:'Cashback credited quarterly, no annual fee ever'},
+  {id:'c17', bank:'HSBC', name:'Cashback Card', category:'Cashback', fee:315, salary:8000, rate:'up to 4% cashback', benefit:'Cashback on groceries, dining and fuel with easy redemption.', color:'#1C1C1E', welcome:'AED 250 cashback on spend of AED 4,000 in first 60 days.', forex:'2.55%', lounge:'2 complimentary visits/year', apr:'3.30% per month', redemption:'Cashback capped at AED 250/month, credited automatically'},
+  {id:'c18', bank:'UAB', name:'Rewards Signature', category:'Rewards', fee:630, firstYearFree:true, salary:10000, rate:'2.5x points', benefit:'Points on all spend categories, redeemable for flights and vouchers.', color:'#4A4A4F', welcome:'4,000 bonus points on first spend.', forex:'2.45%', lounge:'3 complimentary visits/year', apr:'3.30% per month', redemption:'Points redeemable for flights, vouchers or statement credit'},
+];
+
+function feeLabel(c){
+  if(c.fee===0) return 'Free';
+  if(c.firstYearFree) return 'Free (1st yr), then '+c.fee.toLocaleString()+' AED';
+  return c.fee.toLocaleString()+' AED';
+}
+
+let cards = [];
+let activeCategory = 'all';
+let activeBank = 'all';
+let searchTerm = '';
+let compareSet = [];
+let editingId = null;
+
+const STORAGE_KEY = 'yellowcards:cards';
+
+async function loadCards(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, true);
+    cards = res && res.value ? JSON.parse(res.value) : DEFAULT_CARDS.slice();
+  }catch(e){
+    cards = DEFAULT_CARDS.slice();
+  }
+  renderAll();
+}
+
+async function persistCards(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(cards), true);
+  }catch(e){
+    console.error('Storage error', e);
+  }
+}
+
+function initials(bank){
+  return bank.split(' ').map(w=>w[0]).join('').slice(0,3).toUpperCase();
+}
+
+function renderAll(){
+  populateBankFilter();
+  renderGrid();
+  renderAdminTable();
+  document.getElementById('statCount').textContent = cards.length;
+}
+
+function populateBankFilter(){
+  const sel = document.getElementById('bankFilter');
+  const current = sel.value || 'all';
+  const banks = Array.from(new Set(cards.map(c=>c.bank))).sort();
+  sel.innerHTML = '<option value="all">All banks</option>' + banks.map(b=>`<option value="${b}">${b}</option>`).join('');
+  sel.value = banks.includes(current) ? current : 'all';
+}
+
+function renderGrid(){
+  const grid = document.getElementById('cardGrid');
+  const term = searchTerm.trim().toLowerCase();
+  const filtered = cards.filter(c=>{
+    const matchCat = activeCategory==='all' || c.category===activeCategory;
+    const matchBank = activeBank==='all' || c.bank===activeBank;
+    const matchSearch = !term || (c.bank+' '+c.name+' '+c.benefit+' '+c.category).toLowerCase().includes(term);
+    return matchCat && matchBank && matchSearch;
+  });
+  document.getElementById('resultCount').textContent = filtered.length + ' result' + (filtered.length!==1?'s':'');
+  grid.innerHTML = filtered.map(c=>`
+    <div class="card">
+      <div class="card-head">
+        <div class="badge" style="background:${c.color}">${initials(c.bank)}</div>
+        <div class="names">
+          <div class="bank">${c.bank}</div>
+          <div class="name">${c.name}</div>
+        </div>
+      </div>
+      <span class="tag">${c.category}</span>
+      <div class="card-stats">
+        <div><b>${feeLabel(c)}</b><span>ANNUAL FEE</span></div>
+        <div><b>${c.rate}</b><span>KEY RATE</span></div>
+        <div><b>${c.salary.toLocaleString()}</b><span>MIN. SALARY</span></div>
+      </div>
+      <div class="card-benefit">${c.benefit}</div>
+      <div class="card-foot">
+        <label class="compare-check"><input type="checkbox" ${compareSet.includes(c.id)?'checked':''} onchange="toggleCompare('${c.id}')"> Compare</label>
+        <span class="detail-link" onclick="openDetail('${c.id}')">View details</span>
+      </div>
+    </div>
+  `).join('') || '<div class="loading">No cards match those filters yet.</div>';
+}
+
+document.getElementById('filterBar').addEventListener('click', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  activeCategory = chip.dataset.cat;
+  renderGrid();
+});
+document.getElementById('bankFilter').addEventListener('change', e=>{ activeBank = e.target.value; renderGrid(); });
+document.getElementById('heroSearch').addEventListener('input', e=>{ searchTerm = e.target.value; renderGrid(); });
+
+/* ===== Compare ===== */
+function selectAllVisible(){
+  const term = searchTerm.trim().toLowerCase();
+  const filtered = cards.filter(c=>{
+    const matchCat = activeCategory==='all' || c.category===activeCategory;
+    const matchBank = activeBank==='all' || c.bank===activeBank;
+    const matchSearch = !term || (c.bank+' '+c.name+' '+c.benefit+' '+c.category).toLowerCase().includes(term);
+    return matchCat && matchBank && matchSearch;
+  });
+  filtered.forEach(c=>{ if(!compareSet.includes(c.id)) compareSet.push(c.id); });
+  renderTray();
+  renderGrid();
+}
+
+function toggleCompare(id){
+  if(compareSet.includes(id)){
+    compareSet = compareSet.filter(x=>x!==id);
+  } else {
+    compareSet.push(id);
+  }
+  renderTray();
+  renderGrid();
+}
+function clearCompare(){ compareSet=[]; renderTray(); renderGrid(); }
+function renderTray(){
+  const tray = document.getElementById('tray');
+  if(compareSet.length===0){ tray.classList.remove('show'); return; }
+  tray.classList.add('show');
+  document.getElementById('trayCount').textContent = compareSet.length + ' selected';
+  document.getElementById('trayCards').innerHTML = compareSet.map(id=>{
+    const c = cards.find(x=>x.id===id);
+    return `<div class="tray-pill">${c.name}<button onclick="toggleCompare('${id}')">✕</button></div>`;
+  }).join('');
+}
+function openCompare(){
+  if(compareSet.length<2){ alert('Select at least 2 cards to compare.'); return; }
+  const selected = compareSet.map(id=>cards.find(c=>c.id===id));
+  const rows = [
+    ['Bank', c=>c.bank],
+    ['Card name', c=>c.name],
+    ['Category', c=>c.category],
+    ['Annual fee', c=>feeLabel(c)],
+    ['Min. salary', c=>c.salary.toLocaleString()+' AED'],
+    ['Key rate', c=>c.rate],
+    ['Welcome offer', c=>c.welcome||'—'],
+    ['Foreign transaction fee', c=>c.forex||'—'],
+    ['Lounge access', c=>c.lounge||'—'],
+    ['Interest / profit rate', c=>c.apr||'—'],
+    ['Redemption', c=>c.redemption||'—'],
+    ['Key benefit', c=>c.benefit],
+  ];
+  let html = '<div class="compare-scroll"><table class="compare-table"><thead><tr><th class="label"></th>'+selected.map(c=>`<th>${c.bank}</th>`).join('')+'</tr></thead><tbody>';
+  rows.forEach(([label, fn])=>{
+    html += `<tr><td class="label">${label}</td>${selected.map(c=>`<td>${fn(c)}</td>`).join('')}</tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('compareTableWrap').innerHTML = html;
+  document.getElementById('compareModal').classList.add('show');
+}
+function closeCompare(){ document.getElementById('compareModal').classList.remove('show'); }
+
+function openDetail(id){
+  const c = cards.find(x=>x.id===id);
+  document.getElementById('detailTitle').textContent = c.bank + ' — ' + c.name;
+  document.getElementById('detailBody').innerHTML = `
+    <span class="tag">${c.category}</span>
+    <div class="card-stats" style="border-top:none;">
+      <div><b>${feeLabel(c)}</b><span>ANNUAL FEE</span></div>
+      <div><b>${c.rate}</b><span>KEY RATE</span></div>
+      <div><b>${c.salary.toLocaleString()}</b><span>MIN. SALARY</span></div>
+    </div>
+    <p style="font-size:14px; color:var(--grey-700); line-height:1.6;">${c.benefit}</p>
+    <table class="compare-table" style="margin-top:6px;">
+      <tbody>
+        <tr><td class="label">Welcome offer</td><td>${c.welcome||'—'}</td></tr>
+        <tr><td class="label">Foreign transaction fee</td><td>${c.forex||'—'}</td></tr>
+        <tr><td class="label">Lounge access</td><td>${c.lounge||'—'}</td></tr>
+        <tr><td class="label">Interest / profit rate</td><td>${c.apr||'—'}</td></tr>
+        <tr><td class="label">Redemption</td><td>${c.redemption||'—'}</td></tr>
+      </tbody>
+    </table>
+  `;
+  document.getElementById('detailModal').classList.add('show');
+}
+function closeDetail(){ document.getElementById('detailModal').classList.remove('show'); }
+
+/* ===== Nav / views ===== */
+document.querySelectorAll('[data-view]').forEach(a=>{
+  a.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-links a').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.nav-links a[data-view="'+a.dataset.view+'"]').forEach(x=>x.classList.add('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+a.dataset.view).classList.add('active');
+    window.scrollTo({top:0, behavior:'instant'});
+  });
+});
+
+/* ===== Admin auth (client-side gate; see note to user) ===== */
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = '12345';
+let isAdmin = false;
+
+function tryLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    isAdmin = true;
+    document.getElementById('adminLoginWrap').style.display='none';
+    document.getElementById('adminDash').style.display='block';
+    document.getElementById('loginError').style.display='none';
+    renderLeads();
+  } else {
+    document.getElementById('loginError').style.display='block';
+  }
+}
+function logoutAdmin(){
+  isAdmin = false;
+  document.getElementById('adminLoginWrap').style.display='block';
+  document.getElementById('adminDash').style.display='none';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+
+function renderAdminTable(){
+  const body = document.getElementById('adminTableBody');
+  body.innerHTML = cards.map(c=>`
+    <tr>
+      <td>${c.bank}</td>
+      <td>${c.name}</td>
+      <td>${c.category}</td>
+      <td>${feeLabel(c)}</td>
+      <td>${c.salary.toLocaleString()} AED</td>
+      <td style="max-width:220px;">${c.benefit}</td>
+      <td>
+        <button class="icon-btn" title="Edit" onclick="openEditForm('${c.id}')">✏️</button>
+        <button class="icon-btn" title="Delete" onclick="deleteCard('${c.id}')">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openEditForm(id){
+  editingId = id;
+  document.getElementById('editModalTitle').textContent = id ? 'Edit card' : 'Add card';
+  const c = id ? cards.find(x=>x.id===id) : {bank:'',name:'',category:'Cashback',color:'#1C1C1E',fee:'',firstYearFree:false,salary:'',rate:'',benefit:'',welcome:'',forex:'',lounge:'',apr:'',redemption:''};
+  document.getElementById('f_bank').value = c.bank;
+  document.getElementById('f_name').value = c.name;
+  document.getElementById('f_category').value = c.category;
+  document.getElementById('f_color').value = c.color;
+  document.getElementById('f_fee').value = c.fee;
+  document.getElementById('f_firstYearFree').checked = !!c.firstYearFree;
+  document.getElementById('f_salary').value = c.salary;
+  document.getElementById('f_rate').value = c.rate;
+  document.getElementById('f_benefit').value = c.benefit;
+  document.getElementById('f_welcome').value = c.welcome||'';
+  document.getElementById('f_forex').value = c.forex||'';
+  document.getElementById('f_lounge').value = c.lounge||'';
+  document.getElementById('f_apr').value = c.apr||'';
+  document.getElementById('f_redemption').value = c.redemption||'';
+  document.getElementById('saveNote').textContent = '';
+  document.getElementById('editModal').classList.add('show');
+}
+function closeEditForm(){ document.getElementById('editModal').classList.remove('show'); }
+
+async function saveCardForm(){
+  const bank = document.getElementById('f_bank').value.trim();
+  const name = document.getElementById('f_name').value.trim();
+  if(!bank || !name){ document.getElementById('saveNote').textContent = 'Bank and card name are required.'; return; }
+  const data = {
+    bank, name,
+    category: document.getElementById('f_category').value,
+    color: document.getElementById('f_color').value,
+    fee: Number(document.getElementById('f_fee').value)||0,
+    firstYearFree: document.getElementById('f_firstYearFree').checked,
+    salary: Number(document.getElementById('f_salary').value)||0,
+    rate: document.getElementById('f_rate').value.trim(),
+    benefit: document.getElementById('f_benefit').value.trim(),
+    welcome: document.getElementById('f_welcome').value.trim(),
+    forex: document.getElementById('f_forex').value.trim(),
+    lounge: document.getElementById('f_lounge').value.trim(),
+    apr: document.getElementById('f_apr').value.trim(),
+    redemption: document.getElementById('f_redemption').value.trim(),
+  };
+  if(editingId){
+    const idx = cards.findIndex(c=>c.id===editingId);
+    cards[idx] = {...cards[idx], ...data};
+  } else {
+    data.id = 'c'+Date.now();
+    cards.push(data);
+  }
+  await persistCards();
+  renderAll();
+  closeEditForm();
+}
+
+async function deleteCard(id){
+  if(!confirm('Remove this card from the listing?')) return;
+  cards = cards.filter(c=>c.id!==id);
+  await persistCards();
+  renderAll();
+}
+
+loadCards();
+
+/* ===== DBR calculator ===== */
+const DBR_CAP = 0.5;      // 50% of salary
+const MIN_PAYMENT = 0.05; // 5% of card limit counted as monthly obligation
+
+function fmtAED(n){ return 'AED ' + Math.round(n).toLocaleString('en-AE'); }
+
+function calculateDBR(){
+  const salaryEl = document.getElementById('dbrSalary');
+  const cardLimitEl = document.getElementById('dbrCardLimit');
+  const otherEmiEl = document.getElementById('dbrOtherEmi');
+  const resultEl = document.getElementById('dbrResult');
+  const statusText = document.getElementById('dbrStatusText');
+  const percentEl = document.getElementById('dbrPercent');
+  const newLimitEl = document.getElementById('dbrNewLimit');
+  const barFill = document.getElementById('dbrBarFill');
+  const waBtn = document.getElementById('dbrWaBtn');
+
+  const salary = parseFloat(salaryEl.value) || 0;
+  const cardLimit = parseFloat(cardLimitEl.value) || 0;
+  const otherEmi = parseFloat(otherEmiEl.value) || 0;
+
+  if(salary <= 0){
+    resultEl.className = 'dbr-result';
+    statusText.textContent = 'Enter your details to check eligibility';
+    percentEl.textContent = '—';
+    newLimitEl.textContent = '—';
+    barFill.style.width = '0%';
+    barFill.classList.remove('over');
+    waBtn.setAttribute('disabled','');
+    return;
+  }
+
+  const cardObligation = cardLimit * MIN_PAYMENT;
+  const totalObligation = cardObligation + otherEmi;
+  const dbr = (totalObligation / salary) * 100;
+  const maxAllowedObligation = salary * DBR_CAP;
+  const headroom = maxAllowedObligation - totalObligation;
+  const estNewLimit = headroom > 0 ? headroom / MIN_PAYMENT : 0;
+
+  percentEl.textContent = dbr.toFixed(1) + '%';
+  barFill.style.width = Math.min(dbr, 100) + '%';
+
+  if(dbr <= 50 && headroom > 0){
+    resultEl.className = 'dbr-result eligible';
+    statusText.textContent = 'Likely eligible';
+    newLimitEl.textContent = fmtAED(estNewLimit);
+    barFill.classList.remove('over');
+  } else {
+    resultEl.className = 'dbr-result not-eligible';
+    statusText.textContent = 'Over the standard DBR cap';
+    newLimitEl.textContent = 'AED 0';
+    barFill.classList.add('over');
+  }
+
+  const msg = `Hi, I'd like to review my eligibility.%0ASalary: AED ${salary.toLocaleString('en-AE')}%0AExisting card limit: AED ${cardLimit.toLocaleString('en-AE')}%0AOther EMI: AED ${otherEmi.toLocaleString('en-AE')}%0ADBR: ${dbr.toFixed(1)}%25`;
+  waBtn.href = `https://wa.me/971527074559?text=${msg}`;
+  waBtn.removeAttribute('disabled');
+}
+
+['dbrSalary','dbrCardLimit','dbrOtherEmi'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', calculateDBR);
+});
+
+/* ===== Admin tabs ===== */
+document.querySelectorAll('.admin-tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const tab = t.dataset.admintab;
+    document.getElementById('panel-cards').style.display = tab==='cards' ? 'block' : 'none';
+    document.getElementById('panel-leads').style.display = tab==='leads' ? 'block' : 'none';
+    document.getElementById('panel-companies').style.display = tab==='companies' ? 'block' : 'none';
+    if(tab==='leads') renderLeads();
+    if(tab==='companies') renderCompaniesAdmin();
+  });
+});
+
+/* ===== Leads CRM ===== */
+let leads = [];
+let editingLeadId = null;
+let leadStatusFilterVal = 'all';
+const LEADS_KEY = 'yellowcards:leads';
+
+async function loadLeads(){
+  try{
+    const res = await window.storage.get(LEADS_KEY, true);
+    leads = res && res.value ? JSON.parse(res.value) : [];
+  }catch(e){
+    leads = [];
+  }
+  renderLeads();
+}
+
+async function persistLeads(){
+  try{
+    await window.storage.set(LEADS_KEY, JSON.stringify(leads), true);
+  }catch(e){
+    console.error('Storage error', e);
+  }
+}
+
+function statusLabel(s){
+  return {new:'New', contacted:'Contacted', followup:'Follow-up', converted:'Converted', lost:'Lost'}[s] || s;
+}
+
+function renderLeads(){
+  const body = document.getElementById('leadsTableBody');
+  if(!body) return;
+  const filtered = leadStatusFilterVal==='all' ? leads : leads.filter(l=>l.status===leadStatusFilterVal);
+  const countEl = document.getElementById('leadStatCount');
+  if(countEl) countEl.textContent = leads.length + (leads.length===1 ? ' lead' : ' leads');
+  body.innerHTML = filtered.slice().reverse().map(l=>`
+    <tr>
+      <td>${l.name || '—'}</td>
+      <td>${l.company || '—'}</td>
+      <td>${l.phone || '—'}</td>
+      <td>${l.salary ? Number(l.salary).toLocaleString()+' AED' : '—'}</td>
+      <td>${l.dbr!=null ? Number(l.dbr).toFixed(1)+'%' : '—'}</td>
+      <td>
+        <select class="status-select" onchange="updateLeadStatus('${l.id}', this.value)">
+          ${['new','contacted','followup','converted','lost'].map(s=>`<option value="${s}" ${l.status===s?'selected':''}>${statusLabel(s)}</option>`).join('')}
+        </select>
+      </td>
+      <td style="max-width:200px;">${l.notes || '—'}</td>
+      <td>${l.createdAt ? new Date(l.createdAt).toLocaleDateString() : '—'}</td>
+      <td>
+        <button class="icon-btn" title="Edit" onclick="openLeadForm('${l.id}')">✏️</button>
+        <button class="icon-btn" title="Delete" onclick="deleteLead('${l.id}')">🗑️</button>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="9" style="text-align:center; color:var(--grey-400); padding:24px;">No leads yet.</td></tr>`;
+}
+
+const leadFilterEl = document.getElementById('leadStatusFilter');
+if(leadFilterEl){
+  leadFilterEl.addEventListener('change', e=>{ leadStatusFilterVal = e.target.value; renderLeads(); });
+}
+
+async function updateLeadStatus(id, status){
+  const idx = leads.findIndex(l=>l.id===id);
+  if(idx===-1) return;
+  leads[idx].status = status;
+  await persistLeads();
+  renderLeads();
+}
+
+function openLeadForm(id){
+  editingLeadId = id;
+  document.getElementById('leadModalTitle').textContent = id ? 'Edit lead' : 'Add lead';
+  const l = id ? leads.find(x=>x.id===id) : {name:'',company:'',phone:'',salary:'',status:'new',notes:''};
+  document.getElementById('l_name').value = l.name || '';
+  document.getElementById('l_company').value = l.company || '';
+  document.getElementById('l_phone').value = l.phone || '';
+  document.getElementById('l_salary').value = l.salary || '';
+  document.getElementById('l_status').value = l.status || 'new';
+  document.getElementById('l_notes').value = l.notes || '';
+  document.getElementById('leadModal').classList.add('show');
+}
+function closeLeadForm(){ document.getElementById('leadModal').classList.remove('show'); }
+
+async function saveLeadForm(){
+  const name = document.getElementById('l_name').value.trim();
+  const data = {
+    name,
+    company: document.getElementById('l_company').value.trim(),
+    phone: document.getElementById('l_phone').value.trim(),
+    salary: Number(document.getElementById('l_salary').value) || 0,
+    status: document.getElementById('l_status').value,
+    notes: document.getElementById('l_notes').value.trim(),
+  };
+  if(editingLeadId){
+    const idx = leads.findIndex(l=>l.id===editingLeadId);
+    leads[idx] = {...leads[idx], ...data};
+  } else {
+    data.id = 'l'+Date.now();
+    data.createdAt = Date.now();
+    leads.push(data);
+  }
+  await persistLeads();
+  renderLeads();
+  closeLeadForm();
+}
+
+async function deleteLead(id){
+  if(!confirm('Remove this lead?')) return;
+  leads = leads.filter(l=>l.id!==id);
+  await persistLeads();
+  renderLeads();
+}
+
+async function saveDBRLead(name, company, phone, salary, cardLimit, otherEmi, dbr){
+  const lead = {
+    id: 'l'+Date.now(),
+    name: name || 'DBR calculator lead',
+    company: company || '',
+    phone: phone || '',
+    salary,
+    status: 'new',
+    notes: `From DBR calculator — existing card limit AED ${cardLimit.toLocaleString('en-AE')}, other EMI AED ${otherEmi.toLocaleString('en-AE')}.`,
+    dbr,
+    createdAt: Date.now(),
+  };
+  leads.push(lead);
+  await persistLeads();
+  renderLeads();
+}
+
+document.getElementById('dbrWaBtn').addEventListener('click', function(){
+  const salary = parseFloat(document.getElementById('dbrSalary').value) || 0;
+  const cardLimit = parseFloat(document.getElementById('dbrCardLimit').value) || 0;
+  const otherEmi = parseFloat(document.getElementById('dbrOtherEmi').value) || 0;
+  if(salary <= 0) return;
+  const name = document.getElementById('dbrName').value.trim();
+  const company = document.getElementById('dbrCompany').value.trim();
+  const phone = document.getElementById('dbrPhone').value.trim();
+  const totalObligation = cardLimit * MIN_PAYMENT + otherEmi;
+  const dbr = (totalObligation / salary) * 100;
+  saveDBRLead(name, company, phone, salary, cardLimit, otherEmi, dbr);
+});
+
+/* ===== Approved Companies ===== */
+let companies = [];
+let editingCompanyId = null;
+const COMPANIES_KEY = 'yellowcards:companies';
+
+async function loadCompanies(){
+  try{
+    const res = await window.storage.get(COMPANIES_KEY, true);
+    companies = res && res.value ? JSON.parse(res.value) : [];
+  }catch(e){
+    companies = [];
+  }
+  renderCompaniesAdmin();
+}
+
+async function persistCompanies(){
+  try{
+    await window.storage.set(COMPANIES_KEY, JSON.stringify(companies), true);
+  }catch(e){
+    console.error('Storage error', e);
+  }
+}
+
+function renderCompaniesAdmin(){
+  const body = document.getElementById('companiesTableBody');
+  if(!body) return;
+  const countEl = document.getElementById('companyStatCount');
+  if(countEl) countEl.textContent = companies.length + (companies.length===1 ? ' listing' : ' listings');
+  body.innerHTML = companies.slice().reverse().map(c=>`
+    <tr>
+      <td>${c.company}</td>
+      <td>${c.bank}</td>
+      <td>${c.category || '—'}</td>
+      <td style="max-width:220px;">${c.notes || '—'}</td>
+      <td>
+        <button class="icon-btn" title="Edit" onclick="openCompanyForm('${c.id}')">✏️</button>
+        <button class="icon-btn" title="Delete" onclick="deleteCompany('${c.id}')">🗑️</button>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--grey-400); padding:24px;">No listings yet.</td></tr>`;
+}
+
+function openCompanyForm(id){
+  editingCompanyId = id;
+  document.getElementById('companyModalTitle').textContent = id ? 'Edit listing' : 'Add listing';
+  const c = id ? companies.find(x=>x.id===id) : {company:'',bank:'',category:'Listed',notes:''};
+  document.getElementById('co_company').value = c.company || '';
+  document.getElementById('co_bank').value = c.bank || '';
+  document.getElementById('co_category').value = c.category || 'Listed';
+  document.getElementById('co_notes').value = c.notes || '';
+  document.getElementById('companyModal').classList.add('show');
+}
+function closeCompanyForm(){ document.getElementById('companyModal').classList.remove('show'); }
+
+async function saveCompanyForm(){
+  const company = document.getElementById('co_company').value.trim();
+  const bank = document.getElementById('co_bank').value.trim();
+  if(!company || !bank){ return; }
+  const data = {
+    company, bank,
+    category: document.getElementById('co_category').value,
+    notes: document.getElementById('co_notes').value.trim(),
+  };
+  if(editingCompanyId){
+    const idx = companies.findIndex(c=>c.id===editingCompanyId);
+    companies[idx] = {...companies[idx], ...data};
+  } else {
+    data.id = 'co'+Date.now();
+    companies.push(data);
+  }
+  await persistCompanies();
+  renderCompaniesAdmin();
+  closeCompanyForm();
+}
+
+async function deleteCompany(id){
+  if(!confirm('Remove this listing?')) return;
+  companies = companies.filter(c=>c.id!==id);
+  await persistCompanies();
+  renderCompaniesAdmin();
+}
+
+/* Public company search */
+function renderCompanyResults(term){
+  const box = document.getElementById('companyResults');
+  if(!box) return;
+  const q = term.trim().toLowerCase();
+  if(!q){ box.innerHTML = ''; return; }
+  const matches = companies.filter(c=>c.company.toLowerCase().includes(q));
+  if(!matches.length){
+    box.innerHTML = `<p style="color:var(--grey-400); padding:16px 0;">No listing found for "${term.trim()}". WhatsApp me and I'll confirm directly with the bank.</p>`;
+    return;
+  }
+  const byCompany = {};
+  matches.forEach(m=>{
+    const key = m.company;
+    if(!byCompany[key]) byCompany[key] = [];
+    byCompany[key].push(m);
+  });
+  box.innerHTML = Object.entries(byCompany).map(([name, entries])=>`
+    <div style="margin-bottom:18px;">
+      <h4 style="margin:0 0 10px; font-family:'Sora',sans-serif;">${name}</h4>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${entries.map(e=>`
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border:1.5px solid var(--grey-200); border-radius:10px;">
+            <div>
+              <div style="font-weight:700;">${e.bank}</div>
+              ${e.notes ? `<div style="font-size:13px; color:var(--grey-700); margin-top:2px;">${e.notes}</div>` : ''}
+            </div>
+            <span class="chip" style="cursor:default;">${e.category || 'Listed'}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+const companySearchEl = document.getElementById('companySearch');
+if(companySearchEl){
+  companySearchEl.addEventListener('input', e=>renderCompanyResults(e.target.value));
+}
+
+loadCompanies();
+loadLeads();
+</script>
+</body>
+</html>
