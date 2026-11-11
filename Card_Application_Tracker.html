@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Card Application Tracker</title>
+<meta name="description" content="Track credit card applications, follow-ups and approval estimates.">
+<meta name="theme-color" content="#1f3864">
+<style>
+:root{--bg:#ecf0f5;--card:#fff;--tx:#333;--mu:#777;--bd:#d2d6de;--pr:#3c8dbc;--prt:#fff;--ok:#00a65a;--bad:#dd4b39;--warn:#f39c12;--nav:#222d32;--c2:#3c8dbc;color-scheme:light;
+box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root[data-theme="auto"]{--bg:#1a2226;--card:#222d32;--tx:#e6ecef;--mu:#9aa7ad;--bd:#34444c;--pr:#5fa8d3;--prt:#0d1316;--ok:#2fc58a;--bad:#f0705f;--warn:#f5b043;--nav:#111a1e;--c2:#5fa8d3}}
+:root[data-theme="dark"]{--bg:#1a2226;--card:#222d32;--tx:#e6ecef;--mu:#9aa7ad;--bd:#34444c;--pr:#5fa8d3;--prt:#0d1316;--ok:#2fc58a;--bad:#f0705f;--warn:#f5b043;--nav:#111a1e;--c2:#5fa8d3}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif}
+.top{position:static;background:var(--nav);border-bottom:3px solid #3c8dbc;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px}
+.top h1{max-width:960px;margin:0 auto;font-size:17px;font-weight:600;color:#fff;letter-spacing:.2px;display:block}
+.top h1::before{content:none}
+.w{max-width:960px;margin:0 auto;padding:16px}
+.sub{color:var(--mu);font-size:12.5px;margin-bottom:10px}
+.card{background:var(--card);border:0;border-top:3px solid var(--bd);border-radius:3px;padding:14px;margin-bottom:14px;box-shadow:0 1px 1px rgba(0,0,0,.1)}
+#addd{border-top-color:#00a65a}#due{border-top-color:#f39c12}.card:has(#tb){border-top-color:#3c8dbc}
+summary{cursor:pointer;font-weight:600;color:var(--tx);list-style:none;display:flex;justify-content:space-between;align-items:center}summary::-webkit-details-marker{display:none}
+summary::after{content:"+";width:auto;height:auto;border:0;transform:none;margin:0;color:var(--mu);font-weight:400;font-size:18px;line-height:1}details[open]>summary::after{content:"\2013";transform:none;margin:0}
+details[open]>summary{margin-bottom:12px}
+.g{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:640px){.g{grid-template-columns:repeat(3,1fr)}}
+label{display:block;font-size:12px;font-weight:600;color:var(--tx);margin-bottom:4px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:3px;background:var(--card);color:var(--tx);font:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#3c8dbc;box-shadow:none}
+.full{grid-column:1/-1}
+button{font:inherit;border:1px solid #367fa9;border-radius:3px;padding:9px 16px;cursor:pointer;background:#3c8dbc;color:#fff;font-weight:400}
+button:hover{background:#367fa9;filter:none}
+button.s{background:var(--card);color:var(--tx);border:1px solid var(--bd);padding:8px 12px}button.s:hover{background:var(--bg)}
+button[data-d]{color:var(--bad);border-color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}@media(min-width:640px){.stats{grid-template-columns:repeat(3,1fr)}}
+.st{position:relative;display:flex;flex-direction:column;justify-content:space-between;border:0;border-radius:3px;overflow:hidden;color:#fff;cursor:pointer;text-align:left;padding:0;box-shadow:0 1px 1px rgba(0,0,0,.1);background-repeat:no-repeat}
+.st:hover{border:0}
+.st b{order:0;display:block;margin:0;padding:12px 12px 0;font-size:26px;font-weight:700;letter-spacing:0;line-height:1.15;white-space:nowrap;position:relative;z-index:1;color:#fff}
+.st span{order:0;display:block;gap:0;padding:2px 12px 12px;font-size:13px;font-weight:400;color:#fff;position:relative;z-index:1}
+.st span::before{content:none}
+.st::before{content:"";position:absolute;right:8px;top:10px;width:54px;height:54px;border-radius:0;opacity:.25;background-color:transparent;background-image:var(--ic);background-position:center;background-size:contain;background-repeat:no-repeat}
+.st::after{content:"click here \203A";display:block;padding:4px 0;text-align:center;font-size:12px;font-weight:400;color:#fff;background:rgba(0,0,0,.12);position:relative;z-index:1}
+.st:nth-child(1){background-color:#0073b7;--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='8' y1='6' x2='21' y2='6'/%3E%3Cline x1='8' y1='12' x2='21' y2='12'/%3E%3Cline x1='8' y1='18' x2='21' y2='18'/%3E%3Cline x1='3' y1='6' x2='3.01' y2='6'/%3E%3Cline x1='3' y1='12' x2='3.01' y2='12'/%3E%3Cline x1='3' y1='18' x2='3.01' y2='18'/%3E%3C/svg%3E")}
+.st:nth-child(2){background-color:#00c0ef;--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='22' y1='2' x2='11' y2='13'/%3E%3Cpolygon points='22 2 15 22 11 13 2 9 22 2'/%3E%3C/svg%3E")}
+.st:nth-child(3){background-color:#605ca8;--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/%3E%3Cpolyline points='22 4 12 14.01 9 11.01'/%3E%3C/svg%3E")}
+.st:nth-child(4){background-color:#00a65a;--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E")}
+.st:nth-child(5){background-color:#dd4b39;--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='15' y1='9' x2='9' y2='15'/%3E%3Cline x1='9' y1='9' x2='15' y2='15'/%3E%3C/svg%3E")}
+.st:nth-child(6){background-color:#f39c12;--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E")}
+.rc{padding:12px 0;border-top:1px solid var(--bd)}.rc:first-child{border-top:0}.rc .sub{margin:3px 0 8px}
+.mo{display:inline-block}.mo>summary{display:inline-block;font-weight:400;padding:8px 12px;border:1px solid var(--bd);border-radius:3px;margin:0}.mo>summary::after{content:none}.mo[open]{display:block;margin-top:8px}.mo[open]>summary{margin-bottom:8px}
+.ti{border-top:1px solid var(--bd);padding:12px 0 2px}.ti:first-of-type{border-top:0;padding-top:4px}
+.bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:#00a65a;border-radius:0}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:13px}
+th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+th{color:var(--tx);font-weight:700;font-size:12px;letter-spacing:0;text-transform:none;border-bottom:2px solid var(--bd)}
+.b{padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600;color:#fff;background:var(--mu);border:0}
+.b.Approved{background:#00a65a;color:#fff}.b.Rejected{background:#dd4b39;color:#fff}.b.Pending{background:#f39c12;color:#fff}.b.In-Process{background:#00c0ef;color:#fff}.b.Cancelled{background:#777;color:#fff}.b.Submitted{background:#0073b7;color:#fff}
+.Approved{color:var(--ok)}.Rejected{color:var(--bad)}.Pending,.In-Process{color:var(--warn)}.Cancelled{color:var(--mu)}.Submitted{color:var(--pr)}
+.lb{display:inline-block;padding:8px 12px;border:1px solid var(--bd);border-radius:3px;background:var(--card);color:var(--tx);text-decoration:none;font-size:13px;font-weight:400}
+.lb.wa{color:#fff;background:#00a65a;border-color:#008d4c}
+#msg{font-size:13px;color:var(--mu)}
+#sd,#md,#pv,#rq{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:20;overflow-y:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 12px calc(16px + env(safe-area-inset-bottom,0px))}
+#sd .card,#md .card,#pv .card,#rq .card{max-width:560px;margin:0 auto}
+.pr{display:grid;grid-template-columns:1fr;gap:0}.pr>div{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:9px 0;border-bottom:1px solid var(--bd);word-break:break-word}.pr>div:last-child{border-bottom:0}.pr label{margin:0;flex:0 0 42%;font-size:13px;font-weight:400;color:var(--mu)}.pr .v{flex:1;text-align:right}.pr a{color:var(--pr)}
+</style>
+</head>
+<body>
+<div class="top"><h1>Card Application Tracker</h1></div>
+<div class="w">
+
+
+<div class="sub" style="margin-bottom:6px">Current month / Total</div>
+<div class="stats">
+<div class="st"><b id="sT">0 / 0</b><span>Total</span></div>
+<div class="st"><b id="sS">0</b><span>Submitted</span></div>
+<div class="st"><b id="sE">0</b><span>Eligible</span></div>
+<div class="st"><b id="sA">0</b><span>Approved</span></div>
+<div class="st"><b id="sR">0</b><span>Rejected</span></div>
+<div class="st"><b id="sP">0</b><span>Pending</span></div>
+</div>
+
+<div id="tgl" style="margin-bottom:10px"></div>
+<div id="due" class="card" style="display:none"></div>
+<details class="card" id="addd"><summary>Add customer</summary>
+<div style="margin-bottom:14px"><label for="paste"><strong>Quick paste</strong>: paste the whole customer detail here and the fields fill automatically</label>
+<textarea id="paste" rows="5" placeholder="DATE: 03-11-2026&#10;CARD TYPE: SUPER SAVER&#10;CUSTOMER NAME: ...&#10;STATUS: REJECTED&#10;SALARY: 6k"></textarea>
+<div class="row"><button id="fill">Fill form</button><button class="s" id="pclr">Clear</button></div></div>
+<div class="g">
+<div><label for="date">Date</label><input type="date" id="date"></div>
+<div><label for="card">Card type</label><input id="card" placeholder="e.g. Super Saver" list="cards"></div>
+<div><label for="bnk">Bank</label><input id="bnk" placeholder="e.g. CBD" list="banks"></div>
+<datalist id="banks"></datalist>
+<div><label for="temp">Lead temperature</label><select id="temp"><option value="">–</option><option>Hot</option><option>Warm</option><option>Cold</option></select></div>
+<div><label for="src">Lead source</label><input id="src" list="srcs" placeholder="e.g. Business card"></div>
+<datalist id="srcs"><option value="Business card"><option value="WhatsApp bot"><option value="Referral"><option value="Walk-in"><option value="Other"></datalist>
+<div><label for="status">Status</label><select id="status"><option>Pending</option><option>Submitted</option><option>Approved</option><option>Rejected</option><option>In Process</option><option>Cancelled</option></select></div>
+<div class="full"><label for="name">Customer name</label><input id="name" autocomplete="off"></div>
+<div class="full"><label for="company">Company</label><input id="company" autocomplete="off"></div>
+<div><label for="salary">Salary (AED)</label><input id="salary" type="number" inputmode="numeric" min="0"></div>
+<div><label for="nat">Nationality</label><input id="nat"></div>
+<div><label for="visa">Visa type</label><select id="visa"><option value="">Select</option><option>Employment</option><option>Investor / Partner</option><option>Freelance / Self-employed</option><option>Family / Dependent</option><option>Golden</option><option>Visit / Tourist</option><option>Other</option></select></div>
+<div><label for="dsa">DSA code</label><input id="dsa"></div>
+<div><label for="mgr">Team manager</label><input id="mgr"></div>
+<div><label for="dsan">DSA name</label><input id="dsan"></div>
+<div><label for="fu">Follow-up date</label><input type="date" id="fu"></div>
+<div><label for="mob">Mobile number</label><input id="mob" type="tel" inputmode="tel" value="+971 "></div>
+<div><label for="mail">Email ID</label><input id="mail" type="email" inputmode="email"></div>
+<div><label for="ref">Referred by</label><input id="ref"></div>
+<div class="full"><label for="rem">Remarks</label><textarea id="rem" rows="2"></textarea></div>
+</div>
+<datalist id="cards"></datalist>
+<div class="row"><button id="save">Save record</button><button class="s" id="clr">Clear form</button><span id="msg"></span></div>
+<div style="margin-top:14px;border-top:1px solid var(--bd);padding-top:12px"><strong>Bulk add</strong>
+<div class="sub" style="margin:4px 0 8px">Fill the Excel template with many customers, then upload it. A CSV file also works.</div>
+<div class="row"><button class="s" id="btpl">Download Excel template</button><button class="s" id="bup">Upload filled file</button></div>
+<div id="bmsg" class="sub" style="margin:8px 0 0"></div></div>
+</details>
+
+<div class="card">
+<div class="row" style="margin-top:0;justify-content:space-between">
+<strong>Records</strong>
+<span><select id="tf" style="width:auto;display:inline-block"><option value="">All leads</option><option>Hot</option><option>Warm</option><option>Cold</option></select> <input id="q" placeholder="Search…" style="width:160px;display:inline-block"> </span>
+</div>
+<div id="tb"></div>
+<div id="empty" class="sub" style="margin:10px 0 0">No records yet.</div>
+</div>
+
+<details class="card"><summary>Approval estimator</summary>
+
+<div class="sub" style="margin:2px 0 10px">Enter the scores to see when the card can be approved. Leave AECB empty for a thin file. Leave App score empty for a quick pre-check without scores.</div>
+<div class="g">
+<div><label for="e_app">App score</label><input id="e_app" type="number" inputmode="numeric"></div>
+<div><label for="e_aecb">AECB score</label><input id="e_aecb" type="number" inputmode="numeric"></div>
+<div><label for="e_mob">MOB (months)</label><input id="e_mob" type="number" inputmode="numeric" min="0"></div>
+<div><label for="e_sal">Salary (AED)</label><input id="e_sal" type="number" inputmode="numeric" min="0"></div>
+<div><label for="e_emi">Monthly EMI (AED)</label><input id="e_emi" type="number" inputmode="numeric" min="0"></div>
+<div><label for="e_dbr">DBR (%) optional</label><input id="e_dbr" type="number" inputmode="decimal" min="0" placeholder="auto"></div>
+</div>
+<div class="g" style="margin-top:12px">
+<div><label for="e_bank">Existing card: bank name</label><input id="e_bank"></div>
+<div><label for="e_clim">Card limit (AED)</label><input id="e_clim" type="number" inputmode="numeric" min="0"></div>
+</div>
+<div class="row"><button class="s" id="e_add">Add card</button></div>
+<div id="e_list"></div>
+<div class="row"><button id="e_go">Check approval</button></div>
+<div id="e_out" style="margin-top:10px;font-weight:bold"></div>
+<div id="e_tbl" class="tw"></div>
+<div id="e_act" style="display:none;margin-top:12px;border-top:1px solid var(--bd);padding-top:12px">
+<div class="row" style="margin-top:0"><strong>Add to follow-up list</strong><span id="e_bd"></span></div>
+<div class="g" style="margin-top:8px">
+<div class="full"><label for="e_nm">Customer name</label><input id="e_nm" autocomplete="off"></div>
+<div><label for="e_mb">Mobile number</label><input id="e_mb" type="tel" inputmode="tel" value="+971 "></div>
+<div><label for="e_fd">Follow-up date</label><input id="e_fd" type="date"></div>
+</div>
+<div class="row"><button id="e_fu">Add to follow-up list</button></div>
+</div>
+</details>
+
+<details class="card"><summary>DBR calculator</summary>
+<div class="g">
+<div><label for="d_s">Salary (AED)</label><input id="d_s" type="number" inputmode="numeric" min="0"></div>
+<div><label for="d_e">Monthly EMI (AED)</label><input id="d_e" type="number" inputmode="numeric" min="0"></div>
+<div><label for="d_bank">Existing card: bank name</label><input id="d_bank" placeholder="e.g. Fab"></div>
+<div><label for="d_clim">Card limit (AED)</label><input id="d_clim" type="number" inputmode="numeric" min="0"></div>
+<div class="full"><button class="s" id="d_add">Add card</button></div>
+<div class="full" id="d_cl"></div>
+<div class="full"><label for="d_n">New card limit (AED, optional)</label><input id="d_n" type="number" inputmode="numeric" min="0"></div>
+</div>
+<div id="d_out" style="margin-top:10px;font-weight:bold"></div>
+<div id="d_tbl" class="tw"></div>
+<div class="sub" style="margin-top:6px">Card limits count as 5% per month. DBR must be 50% or below and the card limit AED 5,000 or more.</div>
+</details>
+
+<details class="card"><summary>Reports &amp; tools</summary>
+<strong>Commission per approved card (AED)</strong>
+<div class="tw"><table style="min-width:0;margin:6px 0 14px"><thead><tr><th>Salary</th><th>Any card</th><th>CBD One</th><th>Super Saver, Smiles, Visa Infinite</th></tr></thead><tbody id="ctb"></tbody></table></div>
+<div class="g">
+<div><label for="t_tg">Monthly target (submissions)</label><input id="t_tg" type="number" inputmode="numeric" min="0"></div>
+<div class="full"><label for="t_cm">Other commission (used when a card is not in the table)</label><input id="t_cm" placeholder="default=200, CBD=300, ADCB=250"></div>
+</div>
+<strong>Best card finder</strong>
+<div class="g" style="margin:6px 0 14px">
+<div><label for="bf_s">Salary (AED)</label><input id="bf_s" type="number" inputmode="numeric"></div>
+<div><label for="bf_n">Nationality</label><select id="bf_n"><option value="expat">Expat</option><option value="uae">UAE national</option></select></div>
+<div class="full"><label for="bf_r">Card rules: one per line as Card=minimum salary (add |uae or |expat to limit by nationality)</label><textarea id="bf_r" rows="4" placeholder="CBD One=5000&#10;Super Saver=8000&#10;Visa Infinite=30000|expat"></textarea></div>
+<div class="full" id="bf_o"></div>
+</div>
+<div id="rep" style="margin-top:14px"></div>
+<div class="row"><button class="s" id="bkp">Backup</button><button class="s" id="rst">Restore</button><button class="s" id="exp">Export CSV</button><button class="s" id="imp">Import leads</button><button class="s" id="dsb">Daily summary</button></div>
+<div id="dsum"></div>
+<input type="file" id="fl" style="display:none">
+<div id="tmsg" class="sub" style="margin:8px 0 0">Import customers from an Excel, CSV or JSON file. Use the template from Add customer &gt; Bulk add.</div>
+</details>
+
+</div>
+
+<div id="sd"><div class="card">
+<strong id="sdt"></strong>
+<div class="row" id="sdc" style="margin-top:8px"></div>
+<div id="sdb"></div>
+<div class="row"><button id="sdx">Close</button></div>
+</div></div>
+
+<div id="md"><div class="card">
+<strong id="dt">Extra details</strong>
+<div class="sub" style="margin:2px 0 10px">Optional. You can add or edit these later from the records list.</div>
+<div class="g">
+<div><label for="x_aecb">AECB score</label><input id="x_aecb" type="number" inputmode="numeric"></div>
+<div><label for="x_app">App score</label><input id="x_app" type="number" inputmode="numeric"></div>
+<div><label for="x_dbr">DBR (%)</label><input id="x_dbr" type="number" inputmode="decimal"></div>
+<div><label for="x_lim">Approved limit (AED)</label><input id="x_lim" type="number" inputmode="numeric"></div>
+<div><label for="x_mob">Mobile number</label><input id="x_mob" type="tel" value="+971 "></div>
+<div><label for="x_mail">Email ID</label><input id="x_mail" type="email"></div>
+<div><label for="x_status">Status</label><select id="x_status"><option>Pending</option><option>Submitted</option><option>Approved</option><option>Rejected</option><option>In Process</option><option>Cancelled</option></select></div>
+<div><label for="x_bnk">Bank</label><input id="x_bnk" list="banks"></div>
+<div><label for="x_rej">Rejection reason</label><select id="x_rej"><option value="">–</option><option>Low app score</option><option>Low AECB</option><option>High DBR</option><option>Low salary</option><option>Low MOB</option><option>Company not listed</option><option>Documents issue</option><option>Visa type</option><option>Other</option></select></div>
+<div><label for="x_temp">Lead temperature</label><select id="x_temp"><option value="">–</option><option>Hot</option><option>Warm</option><option>Cold</option></select></div>
+<div><label for="x_src">Lead source</label><input id="x_src" list="srcs"></div>
+<div><label for="x_pay">Commission payout</label><select id="x_pay"><option value="">–</option><option value="Pending">Payout pending</option><option value="Received">Payout received</option></select></div>
+<div><label for="x_pm">Expected payout month</label><input id="x_pm" type="month"></div>
+<div><label for="x_fu">Follow-up date</label><input id="x_fu" type="date"></div>
+<div><label for="x_visa">Visa type</label><select id="x_visa"><option value="">Select</option><option>Employment</option><option>Investor / Partner</option><option>Freelance / Self-employed</option><option>Family / Dependent</option><option>Golden</option><option>Visit / Tourist</option><option>Other</option></select></div>
+<div><label for="x_mobm">MOB (months)</label><input id="x_mobm" type="number" inputmode="numeric" min="0"></div>
+<div><label for="x_ref">Referred by</label><input id="x_ref"></div>
+<div><label for="x_emi">Monthly EMI (AED)</label><input id="x_emi" type="number" inputmode="numeric" min="0"></div>
+<div><label for="x_bank">Existing card: bank name</label><input id="x_bank"></div>
+<div><label for="x_clim">Card limit (AED)</label><input id="x_clim" type="number" inputmode="numeric" min="0"></div>
+<div class="full"><button class="s" type="button" id="xca">Add card</button><div id="x_cl"></div></div>
+<div class="full"><label for="x_company">Company name</label><input id="x_company"></div>
+<div class="full"><label for="x_rem">Remarks</label><textarea id="x_rem" rows="3"></textarea></div>
+</div>
+<div class="row"><button id="xs">Save details</button><button class="s" id="xc">Skip</button></div>
+</div></div>
+
+<div id="rq"><div class="card">
+<strong>Required App score and AECB</strong>
+<div id="rqb"></div>
+<div class="row"><button id="rqx">Close</button></div>
+</div></div>
+
+<div id="pv"><div class="card">
+<div class="row" style="margin-top:0;justify-content:space-between"><strong id="pn"></strong><span id="pb"></span></div>
+<div class="pr" id="pc" style="margin-top:12px"></div>
+<div class="row"><button id="pe">Edit details</button><button class="s" id="pk">Add to calendar</button><button class="s" id="pg">Google Calendar</button><button class="s" id="px">Close</button></div>
+<div id="pm" class="sub" style="margin:8px 0 0"></div>
+</div></div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var F=["date","card","name","company","status","salary","nat","dsa","mgr","dsan","rem","fu","visa","mob","mail","ref","bnk","temp","src"];
+var recs=[],col=null,store="local",LS="cardTracker.v1";
+$("date").value=new Date().toISOString().slice(0,10);
+function say(t){$("msg").textContent=t;setTimeout(function(){if($("msg").textContent===t)$("msg").textContent=""},3000)}
+function lsGet(){try{return JSON.parse(localStorage.getItem(LS)||"[]")}catch(e){return []}}
+function lsSet(){try{localStorage.setItem(LS,JSON.stringify(recs))}catch(e){}}
+function esc(s){var d=document.createElement("div");d.textContent=s==null?"":String(s);return d.innerHTML}
+function fmt(d){var p=(d||"").split("-");return p.length===3?p[2]+"-"+p[1]+"-"+p[0]:d||""}
+function render(){
+  var q=$("q").value.toLowerCase();
+  var list=recs.slice().sort(function(a,b){return (b.date||"").localeCompare(a.date||"")||(b.ts||0)-(a.ts||0)});
+  var n=0,h="";
+  list.forEach(function(r){
+    if(q&&JSON.stringify(r).toLowerCase().indexOf(q)<0)return;if($("tf").value&&r.temp!==$("tf").value)return;n++;
+    h+="<div class='rc'><div><b>"+esc(r.name)+"</b> <span class='b "+esc((r.status||"").replace(" ","-"))+"'>"+esc(r.status)+"</span>"+(r.temp?" <span class='b "+({Hot:"Rejected",Warm:"Pending",Cold:"Cancelled"}[r.temp]||"")+"'>"+esc(r.temp)+"</span>":"")+(r.elig?" <span class='b "+esc(r.eligc||"")+"'>"+esc(r.elig)+"</span>":"")+"</div><div class='sub'>"+[r.card,r.bnk,r.salary?"AED "+Number(r.salary).toLocaleString("en-US"):"",fmt(r.date)].filter(Boolean).map(esc).join(" \u00b7 ")+(r.fu?" \u00b7 "+fuCell(r):"")+"</div><div class='row' style='margin-top:0'>"+contactBtns(r)+" <button class='s' data-v='"+esc(r.id)+"'>View</button> <details class='mo'><summary>More</summary><button class='s' data-e='"+esc(r.id)+"'>"+(r.aecb||r.lim||r.mob||r.mail||r.dbr||r.app?"Details \u2713":"Add details")+"</button> <button class='s' data-d='"+esc(r.id)+"'>Delete</button></details></div></div>";
+  });
+  $("tb").innerHTML=h;$("empty").style.display=n?"none":"block";
+  var mo=today().slice(0,7);
+  var cnt=function(fn){var a=recs.filter(fn).length,m=recs.filter(function(r){return fn(r)&&(r.date||"").slice(0,7)===mo}).length;return m+" / "+a};
+  var is=function(){var l=arguments;return function(r){return Array.prototype.indexOf.call(l,r.status)>-1}};
+  $("sT").textContent=cnt(function(){return true});
+  $("sS").textContent=cnt(is("Submitted","In Process","Approved","Rejected"));
+  $("sE").textContent=cnt(function(r){return r.elig==="Eligible"});
+  $("sA").textContent=cnt(is("Approved"));
+  $("sR").textContent=cnt(is("Rejected"));
+  $("sP").textContent=cnt(is("Pending","In Process"));
+  var cs={};recs.forEach(function(r){if(r.card)cs[r.card]=1});
+  $("cards").innerHTML=Object.keys(cs).map(function(k){return "<option value='"+esc(k)+"'>"}).join("");
+  var t=today(),age=function(r){return Math.floor((new Date(t)-new Date(r.date))/864e5)},stale=function(r){return !r.fu&&/^(Pending|Submitted|In Process)$/.test(r.status||"")&&r.date&&age(r)>=7},
+  lbl=function(r){return r.fu?(r.fu<t?["Rejected","overdue "+fmt(r.fu)]:["Pending","today"]):["Pending","pending "+age(r)+" days"]},
+  pr=function(r){return r.fu&&r.fu<t?0:r.fu===t?1:2},tr=function(r){return r.temp==="Hot"?0:r.temp==="Warm"?1:2},
+  dl=recs.filter(function(r){return (r.fu&&r.fu<=t)||stale(r)}).sort(function(a,b){return pr(a)-pr(b)||tr(a)-tr(b)||(a.fu&&b.fu?a.fu.localeCompare(b.fu):age(b)-age(a))});
+  var du=$("due");
+  if(!dl.length){du.style.display="none";du.innerHTML=""}
+  else{du.style.display="block";du.innerHTML="<details><summary>Needs action ("+dl.length+")</summary>"+dl.map(function(r){return "<div class='row' style='justify-content:space-between;margin-top:8px'><span>"+esc(r.name)+(r.elig?" <span class='b "+esc(r.eligc||"")+"'>"+esc(r.elig)+"</span>":"")+" <span class='"+lbl(r)[0]+"'>"+esc(lbl(r)[1])+"</span></span><span>"+contactBtns(r)+" <button class='s' data-v='"+esc(r.id)+"'>View</button> <button class='s' data-x='"+esc(r.id)+"'>"+(r.fu?"Done":"Snooze 3d")+"</button></span></div>"}).join("")+"</details>"}
+  extra();
+}
+function clear(){F.forEach(function(f){if(f!=="date"&&f!=="status")$(f).value=""});$("status").value="Pending";$("mob").value="+971 "}
+$("clr").onclick=clear;$("q").oninput=render;$("tf").onchange=render;
+var XF=["aecb","app","dbr","lim","mob","mail","fu","status","visa","ref","mobm","company","rem","bnk","rej","temp","src","pay","pm"],cur=null;
+function openD(r){
+  cur=r;$("dt").textContent=(r.name||"Customer")+" · extra details";
+  XF.forEach(function(k){$("x_"+k).value=r[k]==null?"":r[k]});
+  if(!$("x_mob").value)$("x_mob").value="+971 ";
+  xcs=(r.cards||[]).slice();$("x_emi").value=r.emi==null?"":r.emi;$("x_bank").value="";$("x_clim").value="";drawX();
+  $("md").style.display="block";$("md").scrollTop=0;
+}
+$("xc").onclick=function(){$("md").style.display="none"};
+function today(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+function fuCell(r){if(!r.fu)return "";var t=today();if(r.fu<t)return "<span class='Rejected'>Overdue \u00b7 "+esc(fmt(r.fu))+"</span>";if(r.fu===t)return "<span class='Pending'>Today</span>";return esc(fmt(r.fu))}
+function num(v){if(v===""||v==null)return null;var x=Number(v);return isNaN(x)?null:x}
+function addMonths(n){var d=new Date();d.setMonth(d.getMonth()+Math.ceil(n));return d.toLocaleDateString("en-GB",{month:"short",year:"numeric"})}
+function est(a,b,m,s){
+  lastP=null;a=num(a);b=num(b);m=num(m);s=num(s);
+  var fast=b!==null&&b>=500&&s!==null&&s>=10000&&(m===null||m<=3);
+  if(a===null&&!fast)return null;
+  var o=[];
+  if(a>=681)o.push({lo:6,hi:9,ra:"681+",rb:"Not needed"});
+  else if(a>=651)o.push({lo:9,hi:12,ra:"651\u2013680",rb:"Not needed"});
+  else if(a>=626){if(b!==null&&b>=681)o.push({lo:12,hi:12,ra:"626\u2013650",rb:"681+"});else if(b!==null&&b>=651)o.push({lo:18,hi:18,ra:"626\u2013650",rb:"651+"})}
+  else if(a>=550){if(b!==null&&b>=681)o.push({lo:18,hi:18,ra:"550\u2013625",rb:"681+"})}
+  if(fast)o.push({lo:0,hi:3,fast:true,ra:"Any",rb:"500+",rs:"10,000+",sn:10000});
+  if(b===null&&a>=600&&s!==null&&s>=8000)o.push({lo:14,hi:14,thin:true,ra:"600+",rb:"None (thin file)",rs:"8,000+",sn:8000});
+  if(!o.length){
+    var why=a<550?"App score is below 550.":(b===null?"AECB score is needed for this app score. A thin file needs app score 600+ and salary AED 8,000+.":"AECB score is too low for this app score band.");
+    return {c:"Rejected",t:"Not eligible now. "+why};
+  }
+  o.sort(function(x,y){return x.lo-y.lo});var p=o[0];lastP=p;
+  if(p.fast){
+    if(m===null)return {c:"Pending",t:"Eligible on the salary 10,000+ and AECB 500+ route only if MOB is 0 to 3 months. Enter MOB to confirm."};
+    return {c:"Approved",t:"Eligible now (salary 10,000+ and AECB 500+ route, MOB 0 to 3 months). MOB is "+m+"."};
+  }
+  var tag=p.thin?" (thin file)":p.fast?" (salary 10,000+ and AECB 500+ route)":"";
+  var rng=p.lo===p.hi?p.lo+" months":p.lo+"\u2013"+p.hi+" months";
+  if(m===null)return {c:"Pending",t:"Needs "+rng+" MOB"+tag+". Enter current MOB to see the date."};
+  if(m>=p.hi)return {c:"Approved",t:"Eligible now"+tag+". Needs "+rng+", MOB is "+m+"."};
+  if(m>=p.lo)return {c:"Approved",t:"Eligible now"+tag+". Minimum "+p.lo+" months met; safest at "+p.hi+" months (around "+addMonths(p.hi-m)+")."};
+  var left=p.lo-m;
+  return {c:"Pending",t:"Eligible in "+left+" month"+(left>1?"s":"")+" (around "+addMonths(left)+")"+tag+". Needs "+rng+" MOB."};
+}
+function showReq(m,s){
+  var rows=[["681+","Not needed",6,9],["651\u2013680","Not needed",9,12],["626\u2013650","681+",12,12],["626\u2013650","651+",18,18],["550\u2013625","681+",18,18]];
+  var h=rows.map(function(r){
+    var w=m===null?"":(m>=r[2]?"<span class='Approved'>Now</span>":"<span class='Pending'>In "+(r[2]-m)+" mo</span>");
+    return "<tr><td>"+r[0]+"</td><td>"+r[1]+"</td><td>"+(r[2]===r[3]?r[2]:r[2]+"\u2013"+r[3])+" mo</td>"+(m===null?"":"<td>"+w+"</td>")+"</tr>";
+  }).join("");
+  var thin="Thin file (no AECB): App score 600+, salary AED 8,000+, MOB 14+"+(m!==null?(m>=14?" (MOB met)":" (in "+(14-m)+" months)"):"")+(s!==null&&s<8000?". Salary is below 8,000.":".");
+  $("rqb").innerHTML="<div class='sub' style='margin:2px 0 8px'>"+(m===null?"MOB not entered. Showing all bands.":"Customer MOB: "+m+" months")+"</div><div class='tw'><table style='min-width:0'><thead><tr><th>App score</th><th>AECB</th><th>MOB needed</th>"+(m===null?"":"<th>Eligible</th>")+"</tr></thead><tbody>"+h+"</tbody></table></div><div class='sub' style='margin-top:10px'>"+thin+"<br>Also eligible: salary AED 10,000+, AECB 500+ and MOB 0 to 3 months, any app score.<br>DBR rule: the eligible card limit must be AED 5,000+.</div>";
+  $("rq").style.display="block";$("rq").scrollTop=0;
+}
+$("rqx").onclick=function(){$("rq").style.display="none"};
+function elig(s,d){if(s===null||s===undefined||d===null)return null;return Math.max(0,Math.floor((50-d)/100*s/0.05/100)*100)}
+var lastP=null,lastTxt="";
+var xcs=[];
+function drawX(){
+  var h="",t=0;
+  xcs.forEach(function(c,i){t+=c.lim;h+="<div class='row' style='justify-content:space-between;margin-top:6px'><span>"+esc(c.bank)+" \u00b7 AED "+Number(c.lim).toLocaleString("en-US")+"</span><button class='s' type='button' data-xc='"+i+"'>Remove</button></div>"});
+  $("x_cl").innerHTML=h?h+"<div class='sub' style='margin-top:6px'>Total card limit AED "+t.toLocaleString("en-US")+"</div>":"";
+}
+$("xca").onclick=function(){var b=$("x_bank").value.trim(),l=num($("x_clim").value);if(!b||!l)return;xcs.push({bank:b,lim:l});$("x_bank").value="";$("x_clim").value="";drawX()};
+$("x_cl").onclick=function(e){var i=e.target.getAttribute&&e.target.getAttribute("data-xc");if(i==null)return;xcs.splice(+i,1);drawX()};
+var ecs=[];
+function drawCards(){
+  var h="",t=0;
+  ecs.forEach(function(c,i){t+=c.lim;h+="<div class='row' style='justify-content:space-between;margin-top:6px'><span>"+esc(c.bank)+" \u00b7 AED "+c.lim.toLocaleString("en-US")+"</span><button class='s' data-ec='"+i+"'>Remove</button></div>"});
+  $("e_list").innerHTML=h?h+"<div class='sub' style='margin-top:6px'>Total card limit AED "+t.toLocaleString("en-US")+"</div>":"";
+}
+$("e_add").onclick=function(){
+  var b=$("e_bank").value.trim(),l=num($("e_clim").value),o=$("e_out");
+  if(!b||!l){o.className="";o.textContent="Enter the bank name and card limit.";return}
+  ecs.push({bank:b,lim:l});$("e_bank").value="";$("e_clim").value="";drawCards();o.textContent="";
+};
+$("e_list").onclick=function(e){var i=e.target.getAttribute&&e.target.getAttribute("data-ec");if(i==null)return;ecs.splice(+i,1);drawCards()};
+function fm(n){return n==null?"\u2013":Number(n).toLocaleString("en-US")}
+function tblHtml(rows){
+  return "<table style='min-width:0;margin-top:8px'><thead><tr><th>Item</th><th>Current</th><th>Required</th><th></th></tr></thead><tbody>"+rows.map(function(x){
+    var st=x[3]===true?"<span class='Approved'>\u2713</span>":x[3]===false?"<span class='Rejected'>\u2717</span>":"<span class='Cancelled'>\u2013</span>";
+    return "<tr><td>"+esc(x[0])+"</td><td>"+esc(x[1])+"</td><td style='white-space:normal'>"+esc(x[2])+"</td><td>"+st+"</td></tr>"}).join("")+"</tbody></table>";
+}
+$("e_go").onclick=function(){
+  var a=num($("e_app").value),b=num($("e_aecb").value),m=num($("e_mob").value),s=num($("e_sal").value),o=$("e_out");
+  var r=est(a,b,m,s),P=lastP;
+  var emi=num($("e_emi").value)||0,tl=0;ecs.forEach(function(c){tl+=c.lim});
+  var ob=emi+tl*0.05,dbr=num($("e_dbr").value),src="entered";
+  if(dbr===null&&s){dbr=ob/s*100;src="calculated"}
+  var el=elig(s,dbr),dR=dbr===null?null:Math.round(dbr*10)/10;
+  var dbrRow=["DBR (%)",dR===null?"\u2013":dR+(src==="calculated"?" (calculated)":""),"50 or below",dbr===null?null:dbr<=50];
+  var limRow=["Eligible card limit (AED)",fm(el),"5,000 or more",el===null?null:(dbr<=50&&el>=5000)];
+  var rows,h,cls;
+  if(!r){
+    var notes=[],ok=true;
+    if(dbr!==null){notes.push("DBR "+dR+"% ("+src+") is "+(dbr>50?"above":"within")+" the 50% limit.");if(dbr>50)ok=false}
+    else notes.push("Add salary or DBR to check DBR.");
+    if(el!==null&&dbr<=50){if(el<5000){notes.push("Eligible card limit is AED "+el.toLocaleString("en-US")+", below the AED 5,000 minimum, so not eligible.");ok=false}else notes.push("Eligible card limit about AED "+el.toLocaleString("en-US")+".")}
+    if(m===null)notes.push("Enter MOB to see the score needed.");
+    else if(m<6&&!(s!==null&&s>=10000&&m<=3)){notes.push("MOB "+m+" is below the minimum, so not eligible yet. Earliest around "+addMonths(6-m)+".");ok=false}
+    else if(m<6){notes.push("Score bands need 6+ months MOB, but the salary 10,000+ route is open (MOB 0 to 3 months) if AECB is 500+, any app score.")}
+    else{
+      var need=m>=18?"App score 651+, or 626+ with AECB 651+, or 550+ with AECB 681+":m>=12?"App score 651+, or 626+ with AECB 681+":m>=9?"App score 651+":"App score 681+";
+      notes.push("At MOB "+m+" you need "+need+".");
+    }
+    if(s!==null&&s>=10000)notes.push("Salary 10,000+ route: needs AECB 500+ and MOB 0 to 3 months"+(m!==null?(m<=3?" (MOB fits)":" (MOB is above 3, so this route is closed)"):"")+".");
+    if(s!==null)notes.push(s>=8000?"Thin file route (no AECB): salary is OK, needs MOB 14+"+(m!==null?(m>=14?" (met)":" ("+(14-m)+" more months)"):"")+" and app score 600+.":"Thin file route needs salary AED 8,000+.");
+    cls=ok?"Pending":"Rejected";
+    lastTxt="Pre-check without scores. "+notes.join(" ")+" Indicative only: confirm with the app score and AECB.";
+    h="Pre-check without scores (indicative). Add App score and AECB for the final result.";
+    rows=[
+      ["App score","Not entered",m===null?"681+ at 6 months, 651+ from 9 months":m>=18?"651+, or 626+ with AECB 651+, or 550+ with AECB 681+":m>=12?"651+, or 626+ with AECB 681+":m>=9?"651+":"681+",null],
+      ["AECB score","Not entered",m===null?"Depends on MOB":m>=18?"651+ if App 626\u2013650, 681+ if App 550\u2013625":m>=12?"681+ if App 626\u2013650":"Not needed",null],
+      ["MOB (months)",m===null?"\u2013":m,"6+ (or 0\u20133 with salary 10,000+ and AECB 500+)",m===null?null:(m>=6||(s!==null&&s>=10000&&m<=3))],
+      ["Salary (AED)",fm(s),"8,000+ (thin file) or 10,000+ (fast route)",s===null?null:s>=8000],
+      dbrRow,limRow];
+    showReq(m,s);preMode=true;
+  }else{
+    var q=P||{ra:"651+, or 550+ with AECB 681+",rb:"681+ if App is below 651"};
+    var line=dbr!==null?"DBR "+dR+"% ("+src+"). "+(src==="calculated"?"Monthly obligations AED "+Math.round(ob).toLocaleString("en-US")+" (EMI plus 5% of card limits). ":""):"";
+    if(dbr!==null&&dbr>50){cls="Rejected";h="Not eligible: DBR is above 50%. By scores alone: "+r.t;lastTxt=line+"Above the 50% DBR limit, so reduce EMI or card limits first. By scores alone: "+r.t}
+    else if(el!==null&&el<5000){cls="Rejected";h="Not eligible: card limit is below AED 5,000. By scores alone: "+r.t;lastTxt=line+"Eligible card limit is AED "+el.toLocaleString("en-US")+", below the AED 5,000 minimum, so not eligible. By scores alone: "+r.t}
+    else{cls=r.c;h=r.t;lastTxt=line+(dbr!==null?"Within the 50% DBR limit. ":"")+(el!==null?"Eligible card limit about AED "+el.toLocaleString("en-US")+". ":"")+r.t}
+    var good=r.c!=="Rejected";
+    rows=[
+      ["App score",fm(a),q.ra,good],
+      ["AECB score",b===null?"None (thin file)":fm(b),q.rb,good],
+      ["MOB (months)",m===null?"\u2013":m,P?(P.lo===P.hi?P.lo+"+":P.lo+"\u2013"+P.hi):"6+",P&&m!==null?(P.fast?m<=P.hi:m>=P.lo):null],
+      ["Salary (AED)",fm(s),P&&P.rs?P.rs:"\u2013",P&&P.sn?(s!==null&&s>=P.sn):null],
+      dbrRow,limRow];
+  }
+  o.className=cls;o.textContent=h;$("e_tbl").innerHTML=tblHtml(rows);
+};
+var preMode=false,lastE=null;
+function tmr(){var d=new Date();d.setDate(d.getDate()+1);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+$("e_go").addEventListener("click",function(){
+  var o=$("e_out"),c=o.className,pre=preMode;preMode=false;
+  if(c!=="Approved"&&c!=="Pending"&&c!=="Rejected"){$("e_act").style.display="none";lastE=null;return}
+  var label=c==="Approved"?"Eligible":c==="Pending"?(pre?"Pre-checked":"Eligible soon"):"Not eligible";
+  lastE={label:label,cls:c,text:lastTxt,app:num($("e_app").value),aecb:num($("e_aecb").value),mobm:num($("e_mob").value),sal:num($("e_sal").value)};
+  $("e_bd").innerHTML="<span class='b "+c+"'>"+label+"</span>";
+  if(!$("e_fd").value)$("e_fd").value=tmr();
+  $("e_act").style.display="block";
+});
+$("e_fu").onclick=async function(){
+  var nm=$("e_nm").value.trim(),o=$("e_out");
+  if(!nm){o.className="";o.textContent="Enter the customer name to add to the follow-up list.";return}
+  if(!lastE)return;
+  var nz=function(v){return v===null?"":v};
+  var r={date:today(),name:nm,status:"Pending",mob:fixMob($("e_mb").value),fu:$("e_fd").value,elig:lastE.label,eligc:lastE.cls,app:nz(lastE.app),aecb:nz(lastE.aecb),mobm:nz(lastE.mobm),salary:nz(lastE.sal),rem:"Pre-check: "+lastE.text,emi:(num($("e_emi").value)===null?"":num($("e_emi").value)),cards:ecs.slice(),ts:Date.now()};
+  var dd=dupOf(r);if(dd&&!confirm("Already saved: "+dd.name+" ("+(dd.bnk||dd.card||"no bank")+", "+dd.status+") with this mobile. Add anyway?"))return;
+  try{
+    if(col){var ref=await col.add(r);r.id=ref.id}
+    else{r.id="l"+r.ts;recs.push(r);lsSet()}
+    $("e_nm").value="";$("e_mb").value="+971 ";$("e_fd").value="";$("e_act").style.display="none";lastE=null;
+    o.className="Approved";o.textContent="Added "+nm+" to the follow-up list.";render();
+  }catch(e){o.className="Rejected";o.textContent="Could not add. Try again."}
+};
+function waNum(m){var d=String(m||"").replace(/\D/g,"");if(d.indexOf("00")===0)d=d.slice(2);else if(d.length===10&&d.charAt(0)==="0")d="971"+d.slice(1);else if(d.length===9&&d.charAt(0)==="5")d="971"+d;return d}
+function contactBtns(r){if(!r.mob)return "";var tel=String(r.mob).replace(/[^\d+]/g,"");return "<a class='lb' data-call='"+esc(r.id)+"' href='tel:"+tel+"'>Call</a> <a class='lb wa' target='_blank' rel='noopener' href='https://wa.me/"+waNum(r.mob)+"'>WhatsApp</a>"}
+function fixMob(v){
+  var t=String(v||"").trim(),d=t.replace(/\D/g,"");
+  if(!d||d==="971")return "";
+  if(t.charAt(0)==="+"&&d.indexOf("971")!==0)return t;
+  if(d.indexOf("00971")===0)d=d.slice(5);else if(d.indexOf("971")===0)d=d.slice(3);else if(d.indexOf("00")===0)return "+"+d.slice(2);
+  return "+971 "+d.replace(/^0/,"");
+}
+var curP=null;
+function openP(r){
+  curP=r;$("pn").textContent=r.name||"Customer";
+  $("pb").innerHTML="<span class='b "+esc((r.status||"").replace(" ","-"))+"'>"+esc(r.status)+"</span>";
+  var mob=r.mob?"<a href='tel:"+encodeURIComponent(r.mob)+"'>"+esc(r.mob)+"</a>":"";
+  var ml=r.mail?"<a href='mailto:"+encodeURIComponent(r.mail)+"'>"+esc(r.mail)+"</a>":"";
+  var L=[["Date",esc(fmt(r.date))],["Card",esc(r.card)],["Bank",esc(r.bnk)],["Company",esc(r.company)],["Salary (AED)",esc(r.salary)],["Nationality",esc(r.nat)],["Visa type",esc(r.visa)],["DSA code",esc(r.dsa)],["Team manager",esc(r.mgr)],["DSA name",esc(r.dsan)],["Follow-up date",r.fu?esc(fmt(r.fu)):""],["AECB score",esc(r.aecb)],["App score",esc(r.app)],["DBR (%)",esc(r.dbr)],["Approved limit (AED)",esc(r.lim)],["Mobile",mob],["Email",ml],["Referred by",esc(r.ref)],["MOB (months)",esc(r.mobm)],["Monthly EMI (AED)",esc(r.emi)],["Rejection reason",esc(r.rej)],["Commission (AED)",r.status==="Approved"&&tbRate(r)!=null?esc(tbRate(r)):""],["Payout",payTxt(r)],["Lead temperature",esc(r.temp)],["Lead source",esc(r.src)],["Calls",callsTxt(r)]];
+  var h=L.map(function(x){return "<div><label>"+x[0]+"</label><span class='v'>"+(x[1]||"\u2013")+"</span></div>"}).join("");
+  h+="<div style='grid-column:1/-1'><label>Remarks</label><span class='v'>"+(r.rem?esc(r.rem):"\u2013")+"</span></div>";
+  var cd=r.cards||[],ct=0;cd.forEach(function(c){ct+=Number(c.lim)||0});
+  h+="<div style='grid-column:1/-1'><label>Existing credit cards</label><span class='v'>"+(cd.length?cd.map(function(c){return esc(c.bank)+": AED "+Number(c.lim).toLocaleString("en-US")}).join("<br>")+"<br><b>Total AED "+ct.toLocaleString("en-US")+"</b>":"\u2013")+"</span></div>";
+  var es=est(r.app,r.aecb,r.mobm,r.salary);if(es)h+="<div style='grid-column:1/-1'><label>Approval estimate</label><span class='v "+es.c+"'>"+esc(es.t)+"</span></div>";
+  h+=r.mob?"<div style='grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap'>"+contactBtns(r)+"</div>":"";
+  if(r.mob)h+="<div style='grid-column:1/-1'><label>WhatsApp message</label><span class='v'><select id='wt'>"+Object.keys(TPL).map(function(k){return "<option value='"+k+"'>"+TPL[k][0]+"</option>"}).join("")+"</select> <button class='s' id='wsend'>Send</button></span></div>";
+  h+="<div style='grid-column:1/-1'><label>Call result</label><span class='v'>"+["No answer","Call back","Interested","Not interested"].map(function(k){return "<button class='s' data-cr='"+k+"'>"+k+"</button>"}).join(" ")+"</span></div>";
+  h+="<div style='grid-column:1/-1'><label>Share details</label><span class='v'><button class='s' data-sh='wa'>WhatsApp</button> <button class='s' data-sh='cp'>Copy</button></span></div>";
+  $("pm").textContent="";$("pc").innerHTML=h;wireWA(r);$("pv").style.display="block";$("pv").scrollTop=0;
+}
+$("px").onclick=function(){$("pv").style.display="none"};
+$("pe").onclick=function(){$("pv").style.display="none";if(curP)openD(curP)};
+function pmsg(t){$("pm").textContent=t}
+function icsE(s){return String(s).replace(/([,;\\])/g,"\\$1").replace(/\n/g,"\\n")}
+function ymd(s){return s.replace(/-/g,"")}
+function nextDay(s){var p=s.split("-"),d=new Date(+p[0],+p[1]-1,+p[2]+1);return d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)}
+function remTitle(r){return "Follow up: "+(r.name||"customer")+(r.card?" ("+r.card+")":"")}
+function remDesc(r){return ["Status: "+(r.status||""),r.mob?"Mobile: "+r.mob:"",r.rem?"Remarks: "+r.rem:""].filter(Boolean).join("\n")}
+$("pk").onclick=async function(){
+  var r=curP;if(!r||!r.fu){pmsg("Set a follow-up date first (Edit details).");return}
+  var ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Card Tracker//EN","BEGIN:VEVENT","UID:"+r.id+"@cardtracker","DTSTAMP:"+new Date().toISOString().replace(/[-:]|\.\d+/g,""),"DTSTART;VALUE=DATE:"+ymd(r.fu),"DTEND;VALUE=DATE:"+nextDay(r.fu),"SUMMARY:"+icsE(remTitle(r)),"DESCRIPTION:"+icsE(remDesc(r)),"BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+icsE(remTitle(r)),"TRIGGER:PT9H","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+  try{
+    await saveFile("Follow_up_"+(r.name||"customer").replace(/[^A-Za-z0-9]+/g,"_")+".ics",ics,"text/calendar");
+    pmsg("Calendar file saved. Open it to add a 9:00 AM reminder.");
+  }catch(e){if(!e||e.code!=="declined")pmsg("Could not save the file. Try Google Calendar.")}
+};
+$("pg").onclick=function(){
+  var r=curP;if(!r||!r.fu){pmsg("Set a follow-up date first (Edit details).");return}
+  var u="https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(remTitle(r))+"&dates="+ymd(r.fu)+"/"+nextDay(r.fu)+"&details="+encodeURIComponent(remDesc(r));
+  var w=window.open(u,"_blank","noopener");if(!w)pmsg("Could not open Google Calendar here. Use Add to calendar instead.");
+};
+$("due").onclick=async function(e){
+  var a=e.target.getAttribute&&e.target.getAttribute("data-v"),b=e.target.getAttribute&&e.target.getAttribute("data-x");
+  if(a){var r=recs.filter(function(x){return x.id===a})[0];if(r)openP(r);return}
+  if(b){try{var br=recs.filter(function(x){return x.id===b})[0],nf=br&&br.fu?"":plus(3);if(col){await col.doc(b).update({fu:nf})}else{recs.forEach(function(x){if(x.id===b)x.fu=nf});lsSet();render()}say(nf?"Snoozed 3 days.":"Follow-up cleared.")}catch(x){say("Could not update.")}}
+};
+$("xs").onclick=async function(){
+  var pb=$("x_bank").value.trim(),pl=num($("x_clim").value);if(pb&&pl)xcs.push({bank:pb,lim:pl});
+  var d={};XF.forEach(function(k){d[k]=$("x_"+k).value.trim()});d.mob=fixMob(d.mob);d.cards=xcs;var en=num($("x_emi").value);d.emi=en===null?"":en;
+  try{
+    if(col){await col.doc(cur.id).update(d)}
+    else{recs.forEach(function(r){if(r.id===cur.id)Object.assign(r,d)});lsSet();render()}
+    $("md").style.display="none";say("Details saved.");
+  }catch(e){say("Could not save details.")}
+};
+function tc(s){return s.toLowerCase().replace(/(^|[\s.'-])([a-z])/g,function(m,a,b){return a+b.toUpperCase()})}
+function parse(){
+  var map={"DATE":"date","CARDTYPE":"card","CARD":"card","CUSTOMERNAME":"name","NAME":"name","COMPANY":"company","STATUS":"status","SALARY":"salary","NATIONALITY":"nat","DSACODE":"dsa","TEAMMANAGER":"mgr","MANAGER":"mgr","DSANAME":"dsan","REMARKS":"rem","FOLLOWUP":"fu","FOLLOWUPDATE":"fu","VISATYPE":"visa","VISA":"visa","MOBILE":"mob","MOBILENUMBER":"mob","PHONE":"mob","EMAIL":"mail","EMAILID":"mail","REFERREDBY":"ref","REFERRER":"ref","BANK":"bnk","LEADSOURCE":"src","SOURCE":"src","LEADTEMPERATURE":"temp"};
+  var n=0;
+  $("paste").value.split(/\r?\n/).forEach(function(line){
+    var i=line.indexOf(":");if(i<1)return;
+    var k=map[line.slice(0,i).toUpperCase().replace(/[^A-Z]/g,"")];
+    var v=line.slice(i+1).trim();if(!k||!v)return;
+    if(k==="date"||k==="fu"){var m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);if(m)v=m[3]+"-"+("0"+m[2]).slice(-2)+"-"+("0"+m[1]).slice(-2);else if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return}
+    else if(k==="status"){var s=v.toLowerCase().replace(/[^a-z]/g,"");var o={approved:"Approved",rejected:"Rejected",declined:"Rejected",pending:"Pending",submitted:"Submitted",inprocess:"In Process",process:"In Process",cancelled:"Cancelled",canceled:"Cancelled"}[s];if(!o)return;v=o}
+    else if(k==="salary"){var t=v.toLowerCase().replace(/[,\s]|aed/g,""),x=parseFloat(t);if(isNaN(x))return;if(/k$/.test(t))x*=1000;v=Math.round(x)}
+    else if(k==="name"||k==="mgr"||k==="dsan"||k==="nat"||k==="card")v=tc(v);
+    else if(k==="visa"){var vo=Array.prototype.filter.call($("visa").options,function(o){return o.value&&o.value.toLowerCase()===v.toLowerCase()})[0];if(!vo)return;v=vo.value}
+    else if(k==="mob")v=fixMob(v);
+    else if(k==="temp"){var to={hot:"Hot",warm:"Warm",cold:"Cold"}[v.toLowerCase()];if(!to)return;v=to}
+    else if(k==="dsa")v=v.toUpperCase();
+    $(k).value=v;n++;
+  });
+  say(n?"Filled "+n+" fields. Check, then tap Save.":"Nothing recognised. Use the format KEY: value.");
+}
+$("fill").onclick=parse;
+$("pclr").onclick=function(){$("paste").value=""};
+$("save").onclick=async function(){
+  var r={};F.forEach(function(f){r[f]=$(f).value.trim()});
+  if(!r.name){say("Enter the customer name.");return}
+  r.mob=fixMob(r.mob);r.salary=r.salary?Number(r.salary):"";r.ts=Date.now();
+  var dd=dupOf(r);if(dd&&!confirm("Already saved: "+dd.name+" ("+(dd.bnk||dd.card||"no bank")+", "+dd.status+") with this mobile. Save anyway?"))return;
+  try{
+    if(col){var ref=await col.add(r);r.id=ref.id}
+    else{r.id="l"+r.ts;recs.push(r);lsSet()}
+    clear();$("paste").value="";$("addd").open=false;say("Saved.");render();openD(r);
+  }catch(e){say("Could not save. Try again.")}
+};
+$("tb").onclick=async function(e){
+  var vid=e.target.getAttribute&&e.target.getAttribute("data-v");
+  if(vid){var vr=recs.filter(function(r){return r.id===vid})[0];if(vr)openP(vr);return}
+  var eid=e.target.getAttribute&&e.target.getAttribute("data-e");
+  if(eid){var rr=recs.filter(function(r){return r.id===eid})[0];if(rr)openD(rr);return}
+  var id=e.target.getAttribute&&e.target.getAttribute("data-d");if(!id)return;
+  if(!confirm("Delete this record?"))return;
+  try{
+    if(col){await col.doc(id).delete()}
+    else{recs=recs.filter(function(r){return r.id!==id});lsSet();render()}
+  }catch(err){say("Could not delete.")}
+};
+$("exp").onclick=async function(){
+  var h=["Date","Card Type","Customer Name","Company","Status","Salary (AED)","Nationality","DSA Code","Team Manager","DSA Name","Remarks","Follow-up Date","Visa Type","Mobile","Email","Referred By","Bank","Lead Temperature","Lead Source","AECB Score","App Score","DBR (%)","Approved Limit (AED)","MOB (months)","Eligibility","Monthly EMI (AED)","Existing Cards","Rejection Reason","Payout Status","Payout Month"];
+  var F2=F.concat(["aecb","app","dbr","lim","mobm","elig","emi","cards","rej","pay","pm"]);
+  var q=function(v){v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  var rows=recs.slice().sort(function(a,b){return (a.date||"").localeCompare(b.date||"")}).map(function(r){return F2.map(function(f){return q(f==="date"||f==="fu"?fmt(r[f]):f==="cards"?(r.cards||[]).map(function(c){return c.bank+" "+c.lim}).join("; "):r[f])}).join(",")});
+  var csv="\ufeff"+h.join(",")+"\n"+rows.join("\n");
+  try{
+    await saveFile("Card_Applications.csv",csv,"text/csv");say("Exported.");
+  }catch(e){if(!e||e.code!=="declined")say("Export failed.")}
+};
+async function saveFile(name,data,mime){
+  var d=null;
+  try{d=await claude.use("downloads")}catch(e){d=null}
+  if(d){await d.save({filename:name,data:data});return}
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([data],{type:mime+";charset=utf-8"}));a.download=name;
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+}
+async function init(){
+  recs=lsGet();render();
+  try{
+    var db=await claude.use("db"),user=await claude.use("user");
+    if(!db||!user)return;
+    var id=await user.id();if(!id)return;
+    col=db.collection("data/users/"+id+"/applications");
+    store="db";
+    var t=setTimeout(function(){},10000);
+    col.onSnapshot(function(s){
+      clearTimeout(t);
+      recs=s.docs.map(function(d){var x=Object.assign({},d.data());x.id=d.id;return x});
+      render();
+    },function(){col=null;recs=lsGet();render()});
+  }catch(e){col=null}
+}
+var CF="cardTracker.cfg",cfg={tg:"",cm:"",tbl:[[500,null,null],[500,null,null],[null,600,750],[null,700,900],[null,750,1000]]},SUB=["Submitted","In Process","Approved","Rejected"],fmode="";
+try{cfg=Object.assign(cfg,JSON.parse(localStorage.getItem(CF)||"{}"))}catch(e){}
+if(!Array.isArray(cfg.tbl)||cfg.tbl.length!==5)cfg.tbl=[[500,null,null],[500,null,null],[null,600,750],[null,700,900],[null,750,1000]];
+$("t_tg").value=cfg.tg;$("t_cm").value=cfg.cm;
+var BANDS=[["5K\u20138K",5000,8000],["8K\u201310K",8000,10000],["10K\u201320K",10000,20000],["20K\u201330K",20000,30000],["30K+",30000,1e12]];
+function tbRate(r){
+  var s=Number(r.salary);if(!s||s<5000)return null;
+  for(var i=0;i<5;i++)if(s>=BANDS[i][1]&&s<BANDS[i][2]){
+    var row=cfg.tbl[i],c=(r.card||"").toLowerCase();
+    if(i<2)return row[0];
+    if(/cbd one/.test(c))return row[1];
+    if(/super saver|smiles|infinite/.test(c))return row[2];
+    return null;
+  }
+  return null;
+}
+function buildTbl(){
+  $("ctb").innerHTML=BANDS.map(function(b,i){
+    var cell=function(j){var on=i<2?j===0:j>0;return "<td>"+(on?"<input type='number' min='0' style='width:80px' data-i='"+i+"' data-j='"+j+"' value='"+(cfg.tbl[i][j]==null?"":cfg.tbl[i][j])+"'>":"\u2013")+"</td>"};
+    return "<tr><td>"+b[0]+"</td>"+cell(0)+cell(1)+cell(2)+"</tr>";
+  }).join("");
+}
+$("ctb").oninput=function(e){var i=e.target.getAttribute("data-i"),j=e.target.getAttribute("data-j");if(i===null)return;cfg.tbl[i][j]=e.target.value===""?null:Number(e.target.value);cfgSave();render()};
+buildTbl();
+function cfgSave(){try{localStorage.setItem(CF,JSON.stringify(cfg))}catch(e){}}
+$("t_tg").oninput=function(){cfg.tg=this.value;cfgSave();render()};
+$("t_cm").oninput=function(){cfg.cm=this.value;cfgSave();render()};
+function plus(n){var d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+function rates(){var m={};String(cfg.cm||"").split(",").forEach(function(p){var k=p.split("=");if(k.length===2)m[k[0].trim().toLowerCase()]=Number(k[1])||0;else if(k[0].trim()&&!isNaN(Number(k[0])))m["default"]=Number(k[0])});return m}
+function dg(m){var d=String(m||"").replace(/\D/g,"");return d.length>=7?d.slice(-9):""}
+function dupOf(r){var d=dg(r.mob);if(!d)return null;var k=(r.bnk||r.card||"").toLowerCase();return recs.filter(function(x){return x.id!==r.id&&dg(x.mob)===d&&(x.bnk||x.card||"").toLowerCase()===k})[0]||null}
+function grp(kf,title){
+  var g={};recs.forEach(function(r){var k=kf(r)||"(none)",x=g[k]=g[k]||{t:0,s:0,a:0,r:0};x.t++;if(SUB.indexOf(r.status)>-1)x.s++;if(r.status==="Approved")x.a++;if(r.status==="Rejected")x.r++});
+  var ks=Object.keys(g).sort(function(a,b){return g[b].t-g[a].t});if(!ks.length)return "";
+  return "<strong>"+title+"</strong><div class='tw'><table style='min-width:0;margin:6px 0 14px'><thead><tr><th></th><th>Total</th><th>Submitted</th><th>Approved</th><th>Rejected</th><th>Approval rate</th></tr></thead><tbody>"+ks.map(function(k){var x=g[k];return "<tr><td>"+esc(k)+"</td><td>"+x.t+"</td><td>"+x.s+"</td><td>"+x.a+"</td><td>"+x.r+"</td><td>"+(x.a+x.r?Math.round(x.a/(x.a+x.r)*100)+"%":"\u2013")+"</td></tr>"}).join("")+"</tbody></table></div>";
+}
+function extra(){
+  var mo=today().slice(0,7),rt=rates(),inM=function(r){return (r.date||"").slice(0,7)===mo};
+  var sb=recs.filter(function(r){return inM(r)&&SUB.indexOf(r.status)>-1}).length,ap=recs.filter(function(r){return inM(r)&&r.status==="Approved"});
+  var by={},tot=0,tg=Number(cfg.tg)||0;
+  var miss=0;ap.forEach(function(r){var k=r.bnk||"No bank",l=k.toLowerCase(),tr=tbRate(r),v=tr!=null?tr:(rt[l]!=null?rt[l]:(rt["default"]||0));if(!v)miss++;by[k]=by[k]||{n:0,v:0};by[k].n++;by[k].v+=v;tot+=v});
+  $("tgl").innerHTML=(tg||tot)?"<div class='sub' style='margin:0 0 4px'>This month: <b>"+sb+(tg?" / "+tg:"")+"</b> submitted"+(tg?" ("+Math.min(100,Math.round(sb/tg*100))+"%)":"")+" \u00b7 <b>"+ap.length+"</b> approved"+(tot?" \u00b7 Est. commission <b>AED "+tot.toLocaleString("en-US")+"</b>":"")+"</div>"+(tg?"<div class='bar'><i style='width:"+Math.min(100,sb/tg*100)+"%'></i></div>":""):"";
+  var h="";
+  if(tot||miss)h+="<strong>Estimated commission this month</strong><div style='margin:6px 0 14px'>"+Object.keys(by).map(function(k){return esc(k)+": "+by[k].n+" approved = AED "+by[k].v.toLocaleString("en-US")}).join("<br>")+"<br><b>Total AED "+tot.toLocaleString("en-US")+"</b>"+(miss?"<br><span class='sub'>"+miss+" approved without a rate (salary below 5K, or card not in the table)</span>":"")+"</div>";
+  var ar=recs.filter(function(r){return r.status==="Approved"}),rc=0,pd=0,pmo={};
+  ar.forEach(function(r){var v=cmOf(r);if(r.pay==="Received")rc+=v;else{pd+=v;var k=r.pm||"No date set";pmo[k]=(pmo[k]||0)+v}});
+  if(ar.length)h+="<strong>Commission payouts (all approved cards)</strong><div style='margin:6px 0 14px'>Received: <b>AED "+rc.toLocaleString("en-US")+"</b><br>Still to receive: <b>AED "+pd.toLocaleString("en-US")+"</b>"+Object.keys(pmo).sort().map(function(k){return "<br><span class='sub'>"+esc(k)+": AED "+pmo[k].toLocaleString("en-US")+"</span>"}).join("")+"</div>";
+  h+=trend()+grp(function(r){return r.bnk},"By bank")+grp(function(r){return r.card},"By card")+grp(function(r){return r.src},"By source");
+  var rj={},rn=0;recs.forEach(function(r){if(r.status==="Rejected"){var k=r.rej||"Not recorded";rj[k]=(rj[k]||0)+1;rn++}});
+  if(rn)h+="<strong>Rejection reasons</strong><div style='margin:6px 0 14px'>"+Object.keys(rj).sort(function(a,b){return rj[b]-rj[a]}).map(function(k){return esc(k)+": "+rj[k]+" ("+Math.round(rj[k]/rn*100)+"%)"}).join("<br>")+"</div>";
+  $("rep").innerHTML=h||"<span class='sub'>Reports appear once you have records.</span>";
+  var bs={};recs.forEach(function(r){if(r.bnk)bs[r.bnk]=1});$("banks").innerHTML=Object.keys(bs).map(function(k){return "<option value='"+esc(k)+"'>"}).join("");
+}
+var AG="Gokul",TPL={
+  docs:["Documents needed","Hello {n}, thank you for your interest in the {c}. To proceed, please share your Emirates ID (front and back), passport copy with visa page, latest salary certificate and 3 months bank statement."],
+  follow:["Follow-up reminder","Hello {n}, this is "+AG+" following up on your {c} application. Please let me know a good time to talk."],
+  sub:["Application submitted","Hello {n}, your {c} application has been submitted. You will get an update from the bank shortly."],
+  appr:["Approved: activation","Hello {n}, good news! Your {c} has been approved. Please keep your Emirates ID ready for activation and delivery."]};
+function wireWA(r){
+  Array.prototype.forEach.call(document.querySelectorAll("[data-sh]"),function(x){x.onclick=function(){
+    var t=shareTxt(r);
+    if(x.getAttribute("data-sh")==="wa"){var w=window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank","noopener");if(!w)pmsg("Could not open WhatsApp here. Use Copy.")}
+    else{try{navigator.clipboard.writeText(t).then(function(){pmsg("Details copied.")},function(){pmsg("Copy is not allowed here.")})}catch(e){pmsg("Copy is not allowed here.")}}
+  }});
+  Array.prototype.forEach.call(document.querySelectorAll("[data-cr]"),function(x){x.onclick=function(){callResult(r,x.getAttribute("data-cr"))}});
+  var b=$("wsend");if(!b)return;
+  b.onclick=function(){
+    var t=TPL[$("wt").value][1].replace("{n}",(r.name||"").split(" ")[0]||"there").replace("{c}",r.card||"credit card");
+    var w=window.open("https://wa.me/"+waNum(r.mob)+"?text="+encodeURIComponent(t),"_blank","noopener");
+    if(!w)pmsg("Could not open WhatsApp here. Use the WhatsApp button instead.");
+  };
+}
+function csvp(t){var rows=[],row=[],c="",q=false;for(var i=0;i<t.length;i++){var ch=t[i];if(q){if(ch=='"'){if(t[i+1]=='"'){c+='"';i++}else q=false}else c+=ch}else if(ch=='"')q=true;else if(ch==","){row.push(c);c=""}else if(ch=="\n"||ch=="\r"){if(ch=="\r"&&t[i+1]=="\n")i++;row.push(c);c="";rows.push(row);row=[]}else c+=ch}if(c||row.length){row.push(c);rows.push(row)}return rows.filter(function(r){return r.join("").trim()})}
+var SYN={date:["date","applicationdate"],card:["card","cardtype"],name:["name","customername","customer","fullname"],company:["company","employer"],status:["status"],salary:["salary","salaryaed"],nat:["nationality","nat"],dsa:["dsacode","dsa"],mgr:["teammanager","manager","mgr"],dsan:["dsaname","dsan"],rem:["remarks","notes","message","rem"],fu:["followup","followupdate","fu"],visa:["visa","visatype"],mob:["mobile","mobilenumber","phone","phonenumber","whatsapp","mob"],mail:["email","emailid","mail"],ref:["referredby","referral","referrer","ref"],bnk:["bank","bnk"],temp:["leadtemperature","temperature","temp"],src:["leadsource","source","src"],aecb:["aecbscore","aecb"],app:["appscore","app"],dbr:["dbr"],lim:["approvedlimitaed","approvedlimit","cardlimit","limit","lim"],mobm:["mobmonths","mobmonth","mobm"],emi:["monthlyemiaed","monthlyemi","emi"],cards:["existingcards","cards"],rej:["rejectionreason","rej"],pay:["payoutstatus","pay"],pm:["payoutmonth","pm"]};
+function mapRec(o){var l={},r={};Object.keys(o).forEach(function(k){l[String(k).toLowerCase().replace(/[^a-z0-9]/g,"")]=o[k]});Object.keys(SYN).forEach(function(f){for(var i=0;i<SYN[f].length;i++){var v=l[SYN[f][i]];if(v!=null&&String(v).trim()!==""){r[f]=Array.isArray(v)?v:String(v).trim();break}}});return r}
+function isoDate(v){v=String(v).trim();if(!v)return "";if(/^\d{4}-\d{2}-\d{2}/.test(v))return v.slice(0,10);var m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);if(m)return m[3]+"-"+("0"+m[2]).slice(-2)+"-"+("0"+m[1]).slice(-2);if(/^\d+(\.\d+)?$/.test(v)&&Number(v)>20000)return new Date(Date.UTC(1899,11,30)+Math.floor(Number(v))*864e5).toISOString().slice(0,10);return ""}
+function numv(v){var x=parseFloat(String(v).toLowerCase().replace(/[,\s]|aed/g,""));if(isNaN(x))return "";return /k\s*$/i.test(String(v))?x*1000:x}
+function monthv(v){v=String(v).trim();var m=v.match(/^(\d{4})-(\d{1,2})/);if(m)return m[1]+"-"+("0"+m[2]).slice(-2);m=v.match(/^(\d{1,2})[-\/](\d{4})$/);if(m)return m[2]+"-"+("0"+m[1]).slice(-2);var d=isoDate(v);return d?d.slice(0,7):""}
+async function addRec(r){if(col){delete r.id;var ref=await col.add(r);r.id=ref.id}else{r.id=r.id||"l"+r.ts+Math.random().toString(36).slice(2,5);recs.push(r)}}
+async function doImport(t){
+  var list,off=2;t=Array.isArray(t)?t:String(t).replace(/^\ufeff/,"").trim();
+  if(Array.isArray(t)){var h=t[0]||[];list=t.slice(1).map(function(c){var o={};h.forEach(function(k,i){if(k!=null&&String(k).trim()!=="")o[k]=c[i]});return o})}
+  else if(t[0]==="["||t[0]==="{"){var j=JSON.parse(t);list=Array.isArray(j)?j:(j.recs||[j]);off=1}
+  else{var rows=csvp(t),h2=rows.shift()||[];list=rows.map(function(c){var o={};h2.forEach(function(k,i){o[k]=c[i]});return o})}
+  var n=0,dup=0,ex=0,bad=[],dd=0,vv=0,ss=0,seen={},vopts=Array.prototype.map.call($("visa").options,function(o){return o.value}).filter(Boolean);
+  for(var i=0;i<list.length;i++){
+    var m=mapRec(list[i]);if(!Object.keys(m).length)continue;
+    if(/^example/i.test(m.name||"")){ex++;continue}
+    if(!m.name&&!m.mob){if(bad.length<6)bad.push(i+off);continue}
+    var r={};
+    r.name=tc(m.name||"Lead");r.mob=m.mob?fixMob(m.mob):"";
+    r.date=m.date?isoDate(m.date):"";if(!r.date){r.date=today();if(m.date)dd++}
+    var st={approved:"Approved",rejected:"Rejected",declined:"Rejected",pending:"Pending",submitted:"Submitted",inprocess:"In Process",process:"In Process",cancelled:"Cancelled",canceled:"Cancelled"}[String(m.status||"").toLowerCase().replace(/[^a-z]/g,"")];
+    r.status=st||"Pending";if(m.status&&!st)ss++;
+    if(m.card)r.card=tc(m.card);if(m.bnk)r.bnk=m.bnk;if(m.company)r.company=m.company;
+    if(m.salary){var sv=numv(m.salary);if(sv!=="")r.salary=Math.round(sv)}
+    if(m.nat)r.nat=tc(m.nat);if(m.dsa)r.dsa=String(m.dsa).toUpperCase();if(m.mgr)r.mgr=tc(m.mgr);if(m.dsan)r.dsan=tc(m.dsan);
+    if(m.rem)r.rem=m.rem;if(m.mail)r.mail=m.mail;if(m.ref)r.ref=m.ref;
+    if(m.fu){var fv=isoDate(m.fu);if(fv)r.fu=fv}
+    if(m.visa){var vo=vopts.filter(function(x){return x.toLowerCase()===String(m.visa).toLowerCase()})[0];if(vo)r.visa=vo;else vv++}
+    r.src=m.src||"Imported";
+    if(m.temp){var tp={hot:"Hot",warm:"Warm",cold:"Cold"}[String(m.temp).toLowerCase()];if(tp)r.temp=tp}
+    ["aecb","app","dbr","lim","mobm"].forEach(function(f){if(m[f]){var nv=numv(m[f]);if(nv!=="")r[f]=String(nv)}});
+    if(m.emi){var ev=numv(m.emi);if(ev!=="")r.emi=ev}
+    if(m.cards){r.cards=Array.isArray(m.cards)?m.cards:String(m.cards).split(/[;\n]/).map(function(x){var q=x.trim().match(/^(.*?)[\s:=-]+([\d,.]+k?)$/i);return q?{bank:tc(q[1].trim()),lim:numv(q[2])||0}:null}).filter(function(x){return x&&x.lim>0})}
+    if(m.rej)r.rej=m.rej;
+    if(m.pay){var pv=/rece/i.test(m.pay)?"Received":/pend/i.test(m.pay)?"Pending":"";if(pv)r.pay=pv}
+    if(m.pm){var pmv=monthv(m.pm);if(pmv)r.pm=pmv}
+    r.ts=Date.now()+i;
+    var key=dg(r.mob)+"|"+(r.bnk||r.card||"").toLowerCase();
+    if(dupOf(r)||(dg(r.mob)&&seen[key])){dup++;continue}
+    seen[key]=1;await addRec(r);n++;
+  }
+  if(!col)lsSet();render();
+  var out="Added "+n+" customer"+(n===1?"":"s")+".";
+  if(dup)out+=" Skipped "+dup+" duplicate"+(dup>1?"s":"")+".";
+  if(bad.length)out+=" Skipped rows with no name or mobile: "+bad.join(", ")+".";
+  if(ex)out+=" Example row ignored.";
+  if(dd)out+=" "+dd+" date"+(dd>1?"s":"")+" not recognised, so today's date was used.";
+  if(ss)out+=" "+ss+" status value"+(ss>1?"s":"")+" not recognised, so set to Pending.";
+  if(vv)out+=" "+vv+" visa type"+(vv>1?"s":"")+" not recognised and left blank.";
+  return out;
+}
+async function inflate(u8){return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer())}
+async function readXlsx(buf){
+  var u=new Uint8Array(buf),dv=new DataView(buf),e=u.length-22,td=new TextDecoder();
+  while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;
+  if(e<0)throw new Error("zip");
+  var n=dv.getUint16(e+10,true),p=dv.getUint32(e+16,true),en={};
+  for(var i=0;i<n;i++){var nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true);en[td.decode(u.subarray(p+46,p+46+nl))]={m:dv.getUint16(p+10,true),cs:dv.getUint32(p+20,true),off:dv.getUint32(p+42,true)};p+=46+nl+xl+cl}
+  async function get(nm){var x=en[nm];if(!x)return null;var o=x.off,l=dv.getUint16(o+26,true)+dv.getUint16(o+28,true),d=u.subarray(o+30+l,o+30+l+x.cs);return td.decode(x.m===0?d:await inflate(d))}
+  var X=function(t){return new DOMParser().parseFromString(t,"text/xml")};
+  var wb=X(await get("xl/workbook.xml")),sh=Array.prototype.slice.call(wb.getElementsByTagName("sheet")),pick=sh.filter(function(x){return x.getAttribute("name")==="Customers"})[0]||sh[0];
+  var rid=pick.getAttribute("r:id"),rels=Array.prototype.slice.call(X(await get("xl/_rels/workbook.xml.rels")).getElementsByTagName("Relationship")),tg=rels.filter(function(x){return x.getAttribute("Id")===rid})[0].getAttribute("Target");
+  var path=tg.charAt(0)==="/"?tg.slice(1):"xl/"+tg,ss=[],sst=await get("xl/sharedStrings.xml");
+  if(sst)Array.prototype.forEach.call(X(sst).getElementsByTagName("si"),function(si){ss.push(Array.prototype.map.call(si.getElementsByTagName("t"),function(t){return t.textContent}).join(""))});
+  var out=[];
+  Array.prototype.forEach.call(X(await get(path)).getElementsByTagName("row"),function(row){
+    var arr=[];Array.prototype.forEach.call(row.getElementsByTagName("c"),function(c){
+      var ref=c.getAttribute("r")||"",L=ref.replace(/\d/g,""),ci=0;for(var k=0;k<L.length;k++)ci=ci*26+L.charCodeAt(k)-64;ci--;
+      var t=c.getAttribute("t"),v=c.getElementsByTagName("v")[0],val="";
+      if(t==="s"&&v)val=ss[Number(v.textContent)]||"";
+      else if(t==="inlineStr")val=Array.prototype.map.call(c.getElementsByTagName("t"),function(x){return x.textContent}).join("");
+      else if(v)val=v.textContent;
+      if(ci>=0)arr[ci]=val;
+    });
+    for(var q=0;q<arr.length;q++)if(arr[q]==null)arr[q]="";
+    out[Number(row.getAttribute("r"))-1]=arr;
+  });
+  for(var z=0;z<out.length;z++)if(!out[z])out[z]=[];
+  return out;
+}
+var TPL64="UEsDBBQAAAAIALEKa11Gx01IlQAAAM0AAAAQAAAAZG9jUHJvcHMvYXBwLnhtbE3PTQvCMAwG4L9SdreZih6kDkQ9ip68zy51hbYpbYT67+0EP255ecgboi6JIia2mEXxLuRtMzLHDUDWI/o+y8qhiqHke64x3YGMsRoPpB8eA8OibdeAhTEMOMzit7Dp1C5GZ3XPlkJ3sjpRJsPiWDQ6sScfq9wcChDneiU+ixNLOZcrBf+LU8sVU57mym/8ZAW/B7oXUEsDBBQAAAAIALEKa12x9ot57gAAACsCAAARAAAAZG9jUHJvcHMvY29yZS54bWzNks9KxDAQh19Fcm+naXEPoduL4klBcEHxFpLZ3WDzh2Sk3bc3jbtdRB9AyCUzv3zzDaRXQSgf8Tn6gJEMppvZji4JFbbsSBQEQFJHtDLVOeFyc++jlZSv8QBBqg95QGibZgMWSWpJEhZgFVYiG3qthIooycczXqsVHz7jWGBaAY5o0VECXnNgwzIxnOaxhytggRFGm74LqFdiqf6JLR1g5+SczJqapqmeupLLO3B4e3p8KetWxiWSTmF+lYygU8Atu0x+7e7udw9saJt2U3Gez67houWiu31fXH/4XYWt12Zv/rHxRXDo4de/GL4AUEsDBBQAAAAIALEKa12ZXJwjEAYAAJwnAAATAAAAeGwvdGhlbWUvdGhlbWUxLnhtbO1aW3PaOBR+76/QeGf2bQvGNoG2tBNzaXbbtJmE7U4fhRFYjWx5ZJGEf79HNhDLlg3tkk26mzwELOn7zkVH5+g4efPuLmLohoiU8nhg2S/b1ru3L97gVzIkEUEwGaev8MAKpUxetVppAMM4fckTEsPcgosIS3gUy9Zc4FsaLyPW6rTb3VaEaWyhGEdkYH1eLGhA0FRRWm9fILTlHzP4FctUjWWjARNXQSa5iLTy+WzF/NrePmXP6TodMoFuMBtYIH/Ob6fkTlqI4VTCxMBqZz9Wa8fR0kiAgsl9lAW6Sfaj0xUIMg07Op1YznZ89sTtn4zK2nQ0bRrg4/F4OLbL0otwHATgUbuewp30bL+kQQm0o2nQZNj22q6RpqqNU0/T933f65tonAqNW0/Ta3fd046Jxq3QeA2+8U+Hw66JxqvQdOtpJif9rmuk6RZoQkbj63oSFbXlQNMgAFhwdtbM0gOWXin6dZQa2R273UFc8FjuOYkR/sbFBNZp0hmWNEZynZAFDgA3xNFMUHyvQbaK4MKS0lyQ1s8ptVAaCJrIgfVHgiHF3K/99Ze7yaQzep19Os5rlH9pqwGn7bubz5P8c+jkn6eT101CznC8LAnx+yNbYYcnbjsTcjocZ0J8z/b2kaUlMs/v+QrrTjxnH1aWsF3Pz+SejHIju932WH32T0duI9epwLMi15RGJEWfyC265BE4tUkNMhM/CJ2GmGpQHAKkCTGWoYb4tMasEeATfbe+CMjfjYj3q2+aPVehWEnahPgQRhrinHPmc9Fs+welRtH2Vbzco5dYFQGXGN80qjUsxdZ4lcDxrZw8HRMSzZQLBkGGlyQmEqk5fk1IE/4rpdr+nNNA8JQvJPpKkY9psyOndCbN6DMawUavG3WHaNI8ev4F+Zw1ChyRGx0CZxuzRiGEabvwHq8kjpqtwhErQj5iGTYacrUWgbZxqYRgWhLG0XhO0rQR/FmsNZM+YMjszZF1ztaRDhGSXjdCPmLOi5ARvx6GOEqa7aJxWAT9nl7DScHogstm/bh+htUzbCyO90fUF0rkDyanP+kyNAejmlkJvYRWap+qhzQ+qB4yCgXxuR4+5Xp4CjeWxrxQroJ7Af/R2jfCq/iCwDl/Ln3Ppe+59D2h0rc3I31nwdOLW95GblvE+64x2tc0LihjV3LNyMdUr5Mp2DmfwOz9aD6e8e362SSEr5pZLSMWkEuBs0EkuPyLyvAqxAnoZFslCctU02U3ihKeQhtu6VP1SpXX5a+5KLg8W+Tpr6F0PizP+Txf57TNCzNDt3JL6raUvrUmOEr0scxwTh7LDDtnPJIdtnegHTX79l125COlMFOXQ7gaQr4Dbbqd3Do4npiRuQrTUpBvw/npxXga4jnZBLl9mFdt59jR0fvnwVGwo+88lh3HiPKiIe6hhpjPw0OHeXtfmGeVxlA0FG1srCQsRrdguNfxLBTgZGAtoAeDr1EC8lJVYDFbxgMrkKJ8TIxF6HDnl1xf49GS49umZbVuryl3GW0iUjnCaZgTZ6vK3mWxwVUdz1Vb8rC+aj20FU7P/lmtyJ8MEU4WCxJIY5QXpkqi8xlTvucrScRVOL9FM7YSlxi84+bHcU5TuBJ2tg8CMrm7Oal6ZTFnpvLfLQwJLFuIWRLiTV3t1eebnK56Inb6l3fBYPL9cMlHD+U751/0XUOufvbd4/pukztITJx5xREBdEUCI5UcBhYXMuRQ7pKQBhMBzZTJRPACgmSmHICY+gu98gy5KRXOrT45f0Usg4ZOXtIlEhSKsAwFIRdy4+/vk2p3jNf6LIFthFQyZNUXykOJwT0zckPYVCXzrtomC4Xb4lTNuxq+JmBLw3punS0n/9te1D20Fz1G86OZ4B6zh3OberjCRaz/WNYe+TLfOXDbOt4DXuYTLEOkfsF9ioqAEativrqvT/klnDu0e/GBIJv81tuk9t3gDHzUq1qlZCsRP0sHfB+SBmOMW/Q0X48UYq2msa3G2jEMeYBY8wyhZjjfh0WaGjPVi6w5jQpvQdVA5T/b1A1o9g00HJEFXjGZtjaj5E4KPNz+7w2wwsSO4e2LvwFQSwMEFAAAAAgAsQprXQRZngOIBgAAkBsAABgAAAB4bC93b3Jrc2hlZXRzL3NoZWV0MS54bWzFWVtz4jYU/isaz3RmO8PGWASSUGDKLRu2JKGQTbb7JrAIbmTJlUUI/fU98q1cZJvNTLcviS3rO+fo6NO5iNZGyJdwRalCbz7jYdtaKRU0bTtcrKhPwjMRUA5flkL6RMGrfLbDQFLiRiCf2bhabdg+8bjVaUVjE9lpibViHqcTicK17xO57VEmNm3LsdKBqfe8UnrA7rQC8kxnVH0JJhLe7EyK6/mUh57gSNJl2+o6zW4fa0A049Gjm3DnGemlzIV40S8jt21VLS2aU/Q2C5gHyrCFtskjGKJEMKZL1aeMtS2Qi8hCea90Aoi2NRdKCT8yEkxWRMHYUoq/KY/0U0ZhMhgWRLNBVDzV8C2WpDXlf030xAbEBnW1q/5K1m1lbtFr231OHXAd7Q/4e05C2hfsyXPVqm1dWsilS7Jmaio2NzTxeV3LWwgWRn/RJp7rgAsW6xDMScDaArVlNHryPR7/J2/Jru1AcT4UJ1CcQPEB1GmUQmsJtPb90PMEen4ILTe4nkDrh2utlkIbCbRxutZaAr1IoBeH0PNSrZcJ9PL7Db5KoFeHWmulUKeacqJ6uskZnzJCHTGqfL1OSinnHZxyUlI572CVk9LKOeLVCWanxHIOmXUCKZ2UWs4Rt04wOyWXc8SuE8ApvZxDfulNzAGfp+CUYM4Rw8rBOGUYPmJYPrPrKThlGD5kWMGa08OIs6B1xLD8rcrMThmGv4NhmeaUYfiQYbh8q3DKMPyO2IVThuEjhpVzG6cMw0cMK48kOGUYPmRY7QSzU4bhiGF2nN2i1DgginRaUmyQjJA6Bday/cuSIhQLCz0jSrxRDIdRj+syZqYkfPVAoOqANNqyFajQ7/YiQfWKUf1IF5XojvgmeL8YfivmHjPhBiVqiXTRwzYwQYfF0B7hLwbUdYlC4UNdszUAPxUDZ4RBUYg+dIeDnw3om2L0HdElFYHKzqR6VAx+9EKS56TPJVZDYbgODbjfinHXgkE5/HEdoBw6jYvxQ6i3mQF2Wwyb0iWVkrqoZ3LTXTF4DDU/mom1XJgMvj8B/ED9gErwmDRJmJScu1kX9YVrQv5ejHygxEe3hEOTIQ3oabnenEM7K0Z2h/0emi2EcbUPJdggyIV+KTG4N0UffjIdosdSnVK8AjvGnu+p3KP4VBKq7nvogy+4WoUm9NeyQAdAtkXD21GuAX+UnI03L1Qef0Y6+JnO5reyQ/Jn0qFNKQkFN0joluSICdlCA4xyo0O3JFsk+MgZJnhJtphC4w5N/T7ShgSYZUGcJTscSbqIJOkO/rVz3qjhq5b9upvc4lmXeR7/2r2djIfoI/SajCqK1MoLEagyJbpiUdV61cG183rjwpTsirGzNUQXNCOvxmM+LAb3ewNTtisGdXt99CCJq9k2HvdNWS8WcLXjXwdXq9V9/94Uqxlx1yMmHo5K9sUPmNj6lCtTZitz5hyCgKKuKbkZSVNr7C9qXKyAQ0z9lb4RsJGeLYRvymYl3l/5RvPuimG9dQgjYYgWEB9MmawY/kSkydZJMQqyCPDalLuKcUnaystA0xIPPcPe52avGKt7qGwbG1cHzHwwTarX9yd9SSY5O5Nq+Oxg1qPhKNSPjsKTQeHl/pSvZkH7k/4o9sw1maNI+y9oyOcu0meyasoVu2K0rp0ckP+pl/+pJP6NuKKShnDukMeRkhDMGJpTTpeeMgZ0e6fFceHvIxTBblQNA8HFmiudJg4/pReLn3HzswMLB5NWYjOQIhiIDdcXp9HAiAdrdQtHBSiYDQ6lFDIbhC0nupTtMWgX4ltVKKTbFoMcDGr1rfGaEadjTSjXYbKSxZVKWm5U4oQLDyOOJlIsQHalT/iCMkZdq2VnQlr2/jLylnWPm/c/aFk3QlV0RKj0BXuXrUCjJpQTP3YTpnRBvdf3OXeEm6MfZO6/+Quo8QqnQkhkowmRilNZuZaUMk0TGJtRtvxIo+nAo2vie1BD2mhAA1ixxn+C7aG8Aq0eVLY2eoA2BrRV7tWKyvd44Q437/5DLyCq587iK44NkRx2bc81e0ms8rQiKtQtwxzoGDd5hAEv2ctHj79/kd9w89v/ucgxFKsEVhXqRqii33RLVbnxnlcIupxoJIzuDaJH6Dwqyf0D4kIhrQTYMBCLteZQiLwwXNNK1O5rM05xzMFAGP9WdUvkswcBltElxNfq2UXdQjK+RopflAii1ca/7sS3TtABU6knwPelECp90bdV2Y9wnX8AUEsDBBQAAAAIALEKa10k2Ka/qwcAAIwgAAAYAAAAeGwvd29ya3NoZWV0cy9zaGVldDIueG1spVp/b9s4Ev0qAwN3lwKOHUtJmnaTAHHsbgPUbRCnLfZPWqZtnSlRS1JJ/O1vhrItd5fSeHFF0+jXPM0bcoZvqF6/arO2KykdvGUqtzedlXPFx37fJiuZCdvThczxzkKbTDg8Ncu+LYwUc2+UqX50dnbZz0Sad26v/bVHc3utS6fSXD4asGWWCbMZSqVfbzqDzu7CU7pcObrQv70uxFJOpftePBo86+9R5mkmc5vqHIxc3HTuBh/v4ysy8E/8SOWrPTgGojLTek0nD/Obzhl5JJVMHEEI/PUi76VShIR+/LkF7ezfSYaHxzv0T548kpkJK++1+pnO3eqmc9WBuVyIUrkn/fpZbgldEF6ilfX/wmv1bHTegaS0TmdbY/QgS/Pqt3jbBuLA4OKqwSDaGkR/Mbg8azCItwaxJ1p55mmNhBO310a/gqGnEY0OfGzwHN+DdNKcxnHqDN5O0dDd3vt3SAxGqdZQFkqLOTiZFUo4ed13+A56sJ/gD2LvXxDvXxBXL4gbXjDowe8aHP5dSdi9zYJ3uQcYaojgZGnkpgupEypN3kFqQeQg3wR6IXswwkF3Eu+CNqBfpHk1qT/vtfh3vvfvvN2/qAfj3GEAdC63EceTAn8QqQvWCePSfAkLozO6BGgw0pBrB8lK5EvpieE4lFkOK8wkfNhCmvtnB20uXuxdvGh3Me7Bt1xt9tGDryKTFIyJnqVKUryM/LNMjZwjGQzQBjQ6ZXZe4X1dUNYI1ebP5d6fy3Z/znswFS8V8QU5ICz03pR9gxN06n76412X7uW76YQjh/Ggp50RyVqaj3A3n9fB/vfS/QZDmn8CL/uz75Uloivpf8k2z9/vPX/f7vmFn3EWk8ytvEOWIplVYRT5vL42E/maQpwIMyd+fkKm1k+FvePC4NPrtCikf2aOfNME88a2Ofth7+yHytnzptT0o/crkjccMoY/V8JRxkma1wH7e8b+TmF1R0ovQpXSQh+q5aKF0+CsrjdnFfhFA/job3Wl4sTZ3RVVcKn4zxEDs3B0Opmc/oF/aKBwgMZviVTbm0NFA3iDYZiLTS8UhH/u6K+UD0rsoB3pl7wNcj8S4D8WFqVSkCNOmBMD9LQtEz5Rq+rxro1jVHOM2pErsCA5xvL73XiXgXmZzaQJM2NQfmFGcW7lVa9eg5gJPeX/86YIUzvGWNDEpSKmG5gxIM/yrTX16pVucN6ONMSUCNI4wo7cx+pIS3OdiGE+DBrHp14WBxdMeHVWiHwTpMSYjlFa6A2mZHMqMQgcjXo1HVy2I02FQgUNJ3fj0bsgF8Z+onO3QnlgPU4PvvosslQUB9E6TI6BrCDa6NVL7uA9gyUq6ZG68Egx5vvimdc4YU4MEDdgVzWjq3akH6kVzTXhGGOHxmESjHU1b7GPcl14yF8kxsbgAv2IIjWXpgufjJS48iUSL06lWpzKaqLP8ZbIUpwlfdTT2ATOPcTvWuFBF9ApFGl9eNalQZHThW+kH9uiVauYwQdmejvhShsMFWN5uORbj1Kv649IAbVYOIgM7ta2C9NylqXOUXTwXQZ7Czx6kv/FHpOOHnJ4NDqR1nbhnoJKYrQlKFGtgiJGXHzSpLFOywKa9BCH8BWnMxblHYxXPaFgcDiMzIlqmRMx4mKciVQFqRxjCA+jsP+MMZPWUS1hIlZCLKQhCTEMFirO/OdK08ZGBeF7wm3lCtNi0DhatYKJGP3wBXtSmGJiJ+F5xpj/xEJQtXqKgBJqjqgXDrNiwIalxSvW+raqC9SoWMw8mGlHiUfBEwqvC7U+TXO+DEW1+IkY2eHD8IzlUBqsJCYcCwbjM741paYK6+5fBhmb7HBEWEhHfE2GJQaLcRvXWhhFjDYZTe8QbR7myNj+gTMFCCBBgDCl/08ZRbUyihgZ8ixFBhORi2Wwjx0eZZ9V9mEqLEA7lVoFRYz6oIg2tX/H2DbqVM6Yo1DLnojRHnfj+yFME92QO8dYJ1gbUWhYAgmzYVBYYRrVwiTi5UULnX+iTZrpMCgsnbiWFDG3kA+f4ORfwQ6CNZUzB7PSoBYEQ5xovw4LZYIiMciLA+R51bIiZhb4nTKDLymKteY26Wgcv6WnCCzMjcHhudWSI+Z2Tb4N4SSj/s2GObG7LmQKOAfpS0m9rUm7l2FyDCBP7mDjn1nsd33pePLQMmrc7od2QkFWQ4VpMSg8rVpIxMyKPd5tA9PuTrCv4RD8fgrtNvtJ2AUrC4Fph1Nzhl28zNJEK52H9cRR2B73N6iP25jXsiJmFvaqM6KK9ySF1cGtaQ7Df8igvSSzbbMO95MaKDOQX5AIglRluAt0SotNFz6nyxVgWayuVdsj1THmHektv33kP+Wo1PqWb6STkrpri3rOltJ3xlW7zovRuBY2MaMrHsVGlw6aW2MOAH3P0EMai6LCopiKwxLXEEzOs11v/CQTmb609rtxLX9iRoVsCfuSEOTL2I/fimq2bNn6gkDfXGj7/3QyCXNlQLe2XR+77edGiM6iy9NB1Ea7lkwxI1eeZCbMOjzCnF6qZubfviVtqTHWTaqvf/CpmL7TT4RZprnF3m6BOGe99whoqk/f1YnThf/2jB0a9jn+kD5ySkMP4P2FRh+3J/RBev8fEG7/B1BLAwQUAAAACACxCmtdImyAoHYDAAAHEwAADQAAAHhsL3N0eWxlcy54bWzdWG1vmzAQ/iuI7y0hpCxMIVJLFWnSOlVqP2wfnWASSwYz43RJf/18mPDS+qp0K5q0oAr7zs/znM9nbHVRqSOnDztKlXPIeVHF7k6p8rPnVZsdzUl1KUpaaE8mZE6U7sqtV5WSkrQCUM696WQSejlhhbtcFPt8lavK2Yh9oWJ32poc8/qSxq4fzlzH0CUipbF7e3txd3fxQ/9czzr+ajh+cjmBgV4jtlxkoug0r1xj0Ewkp84T4bGbEM7WkgEqIznjR2OegmEjuJCO0pPV1D5Yqmfj9k0P8tDw5KwQstY2Ci91riUjHPzrhqETkNu1jnyyqn8Dlck5hO8bzTD5Tyt43k/Yn0+LnPWQ9QuWgnHeLsXMNYbloiRKUVmsdKfG1MZXLqdpPx5LvRZbSY7+9Mo9G1AJzlKQ3Cb9OfurYB6aWHvQvyRdTeFBSeuXTsdayJTKwX4wpuWC00xpuGTbHbyVKCHPQimR60bKyFYUpM7WCdFHOvW+jV21q/fdYJFvVvDUscHQRuNMRD22DudMgB55ivtMhBncm1jT0PnaUM4fgOR71ibN11SHrPdBmMDnoGibOtNN09CYDgj12Qx3nzb8I16nZE9C3ez1FIq6/3MvFL2XNGOHun/I2gAG7M1nz/BPP55/Fo1KH4zK7o/Lbk6Q0fh7heN37NM+u7aTsuTHa862RU5NXZ8tuFyQE87ZCcmetRp8gjfaQKXrPFGp2KZv+SVJ+UgPqvlme4fsrXIMuqiDF1F/RDmOQB+Myu6Py94vxxH4e+U4G7XY/9lWGjH2j9uo3abUR6R9R3rNmdQ7+AbHXmt14E4Wu9/gFsw7OWe9Z1yxountWJrS4tXpp+kVWetb/oBfj09pRvZcPbbO2O3adzRl+zxqR91DCppRXfsrXBf0UXq6aGotVqT0QNOk6erzf3BzMj8AvPR0d+PXHgxjfHYP+DAdLAIMY1CYzv80nzk6H+PDYptbPXMUM0cxBmXzJPWD6dgxkf7ZZxpFQRCGWEaTxBpBguUtDOHPzobFBghMB5Tel2t8tfEKebsOsDV9q0KwmeKViM0UzzV47HkDRBTZVxvTAQS2CljtgL5dB2rKjgkCWFUsNmwH454owjxQi/YaDUMkOyE89vXBdkkQRJHdAz57BEGAeWA34h4sAogB8wRBfQ6+OI+80znldf/6Wv4GUEsDBBQAAAAIALEKa12XirscwAAAABMCAAALAAAAX3JlbHMvLnJlbHOdkrluwzAMQH/F0J4wB9AhiDNl8RYE+QFWog/YEgWKRZ2/r9qlcZALGXk9PBLcHmlA7TiktoupGP0QUmla1bgBSLYlj2nOkUKu1CweNYfSQETbY0OwWiw+QC4ZZre9ZBanc6RXiFzXnaU92y9PQW+ArzpMcUJpSEszDvDN0n8y9/MMNUXlSiOVWxp40+X+duBJ0aEiWBaaRcnToh2lfx3H9pDT6a9jIrR6W+j5cWhUCo7cYyWMcWK0/jWCyQ/sfgBQSwMEFAAAAAgAsQprXRWNq4xKAQAAuAIAAA8AAAB4bC93b3JrYm9vay54bWy1UtFqwzAM/JXgD1jashVWmr60bCuMrayj706iNKK2FWSl3fr1cxzCAoOxlz3ZOonz3cnLC/EpJzolH9Y4n6lapFmkqS9qsNrfUAMudCpiqyWUfEx9w6BLXwOINelsMpmnVqNTq+XAteN0XJBAIUgugB1wQLj4735XJmf0mKNB+cxUvBtQiUWHFq9QZmqiEl/T5YkYr+REm33BZEympn3jACxY/ID3nch3nfuIiM7fdBCSqfkkEFbIXuJE5NdB4xnCcF+1Qg9oBHijBR6Z2gbdsaMJLtKRjZjDcPYhLvgvMVJVYQEbKloLTvocGUwn0PkaG68Spy1kat16IQvsO0/hkW3Z+5MgbJQWLzA0eFtGif8nZ+u8cBsXOlY0+0XRLIY2JFVChQ7Kl8DmAx62Vuw46Y7obHZ7N70P22mNWQfs1T2TLofgh0+z+gJQSwMEFAAAAAgAsQprXY33LFq0AAAAiQIAABoAAAB4bC9fcmVscy93b3JrYm9vay54bWwucmVsc8WSTQqDMBBGrxJygI7a0kVRV924LV4g6PiD0YTMlOrta3WhgS66ka7CNyHvezCJH6gVt2agprUkxl4PlMiG2d4AqGiwV3QyFof5pjKuVzxHV4NVRadqhCgIruD2DJnGe6bIJ4u/EE1VtQXeTfHsceAvYHgZ11GDyFLkytXIiYRRb2OC5QhPM1mKrEyky8pQwr+FIk8oOlCIeNJIm82avfrzgfU8v8WtfYnr0N/J5eMA3s9L31BLAwQUAAAACACxCmtdbqckvB4BAABXBAAAEwAAAFtDb250ZW50X1R5cGVzXS54bWzFlM9OwzAMxl+lynVqMnbggNZdgCvswAuE1l2j5p9ib3Rvj9tuk0CjYioSl0aN7e/n+IuyfjtGwKxz1mMhGqL4oBSWDTiNMkTwHKlDcpr4N+1U1GWrd6BWy+W9KoMn8JRTryE26yeo9d5S9tzxNprgC5HAosgex8SeVQgdozWlJo6rg6++UfITQXLlkIONibjgBKGuEvrIz4BT3esBUjIVZFud6EU7zlKdVUhHCyinJa70GOralFCFcu+4RGJMoCtsAMhZOYoupsnEE4bxezebP8hMATlzm0JEdizB7bizJX11HlkIEpnpI16ILD37fNC7XUH1SzaP9yOkdvAD1bDMn/FXjy/6N/ax+sc+3kNo//qq96t02vgzXw3vyeYTUEsBAhQDFAAAAAgAsQprXUbHTUiVAAAAzQAAABAAAAAAAAAAAAAAAIABAAAAAGRvY1Byb3BzL2FwcC54bWxQSwECFAMUAAAACACxCmtdsfaLee4AAAArAgAAEQAAAAAAAAAAAAAAgAHDAAAAZG9jUHJvcHMvY29yZS54bWxQSwECFAMUAAAACACxCmtdmVycIxAGAACcJwAAEwAAAAAAAAAAAAAAgAHgAQAAeGwvdGhlbWUvdGhlbWUxLnhtbFBLAQIUAxQAAAAIALEKa10EWZ4DiAYAAJAbAAAYAAAAAAAAAAAAAACAgSEIAAB4bC93b3Jrc2hlZXRzL3NoZWV0MS54bWxQSwECFAMUAAAACACxCmtdJNimv6sHAACMIAAAGAAAAAAAAAAAAAAAgIHfDgAAeGwvd29ya3NoZWV0cy9zaGVldDIueG1sUEsBAhQDFAAAAAgAsQprXSJsgKB2AwAABxMAAA0AAAAAAAAAAAAAAIABwBYAAHhsL3N0eWxlcy54bWxQSwECFAMUAAAACACxCmtdl4q7HMAAAAATAgAACwAAAAAAAAAAAAAAgAFhGgAAX3JlbHMvLnJlbHNQSwECFAMUAAAACACxCmtdFY2rjEoBAAC4AgAADwAAAAAAAAAAAAAAgAFKGwAAeGwvd29ya2Jvb2sueG1sUEsBAhQDFAAAAAgAsQprXY33LFq0AAAAiQIAABoAAAAAAAAAAAAAAIABwRwAAHhsL19yZWxzL3dvcmtib29rLnhtbC5yZWxzUEsBAhQDFAAAAAgAsQprXW6nJLweAQAAVwQAABMAAAAAAAAAAAAAAIABrR0AAFtDb250ZW50X1R5cGVzXS54bWxQSwUGAAAAAAoACgCEAgAA/B4AAAAA";
+$("btpl").onclick=function(){
+  var b=atob(TPL64),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([u],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));a.download="Customer_Bulk_Template.xlsx";
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+  $("bmsg").textContent="Template downloaded. Fill it in, then tap Upload filled file.";
+};
+function shareTxt(r){
+  var L=[["DATE",fmt(r.date)],["CARD TYPE",(r.card||"").toUpperCase()],["CUSTOMER NAME",r.name],["COMPANY",r.company],["STATUS",(r.status||"").toUpperCase()],["SALARY",r.salary],["NATIONALITY",r.nat],["DSA CODE",r.dsa],["TEAM MANAGER",r.mgr],["DSA NAME",r.dsan],["VISA TYPE",r.visa],["MOBILE",r.mob],["EMAIL",r.mail],["REFERRED BY",r.ref],["BANK",r.bnk],["FOLLOW UP",r.fu?fmt(r.fu):""],["REMARKS",r.rem]];
+  return L.filter(function(x){return x[1]!==""&&x[1]!=null}).map(function(x){return x[0]+": "+x[1]}).join("\n");
+}
+async function doRestore(t){
+  var j=JSON.parse(t.replace(/^\ufeff/,"")),arr=Array.isArray(j)?j:(j.recs||[]),n=0;
+  for(var i=0;i<arr.length;i++){
+    var r=Object.assign({},arr[i]);
+    if(recs.some(function(x){return x.ts&&x.ts===r.ts&&x.name===r.name}))continue;
+    await addRec(r);n++;
+  }
+  if(j.cfg){Object.assign(cfg,j.cfg);cfgSave();if(!Array.isArray(cfg.tbl)||cfg.tbl.length!==5)cfg.tbl=[[500,null,null],[500,null,null],[null,600,750],[null,700,900],[null,750,1000]];$("t_tg").value=cfg.tg;$("t_cm").value=cfg.cm;buildTbl();$("bf_r").value=cfg.cr||""}
+  if(!col)lsSet();render();
+  return "Restored "+n+" record(s).";
+}
+$("bkp").onclick=async function(){
+  try{await saveFile("Card_Tracker_Backup_"+today()+".json",JSON.stringify({v:1,date:today(),recs:recs,cfg:cfg}),"application/json");$("tmsg").textContent="Backup saved ("+recs.length+" records)."}
+  catch(e){if(!e||e.code!=="declined")$("tmsg").textContent="Backup failed."}
+};
+$("rst").onclick=function(){fmode="r";$("fl").accept=".json";$("fl").click()};
+function pickImport(){fmode="i";$("fl").accept=".xlsx,.csv,.json,.txt";$("fl").click()}
+$("imp").onclick=pickImport;$("bup").onclick=pickImport;
+function note(t){$("tmsg").textContent=t;$("bmsg").textContent=t}
+$("fl").onchange=async function(){
+  var f=this.files[0];this.value="";if(!f)return;
+  try{
+    if(fmode==="r"){$("tmsg").textContent=await doRestore(await f.text());return}
+    if(/\.xlsx$/i.test(f.name))note(await doImport(await readXlsx(await f.arrayBuffer())));
+    else if(/\.xls$/i.test(f.name))note("Old .xls files are not supported. Save the file as .xlsx or CSV and try again.");
+    else note(await doImport(await f.text()));
+  }catch(e){note("Could not read that file. Use the Excel template (.xlsx) or a CSV file.")}
+};
+
+function dstr(ts){var d=new Date(ts);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+function cmOf(r){var t=tbRate(r);if(t!=null)return t;var rt=rates(),l=(r.bnk||"No bank").toLowerCase();return rt[l]!=null?rt[l]:(rt["default"]||0)}
+function payTxt(r){return r.status!=="Approved"?"":(r.pay==="Received"?"Received":"Pending"+(r.pm?" \u00b7 expected "+esc(r.pm):""))}
+function callsTxt(r){var c=r.calls||[];if(!c.length)return "";var l=c[c.length-1],d=new Date(l.t);return c.length+" call"+(c.length>1?"s":"")+" \u00b7 last "+fmt(dstr(l.t))+" "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)+(l.n?" ("+esc(l.n)+")":"")}
+async function upd(id,o){try{if(col){await col.doc(id).update(o)}else{recs.forEach(function(r){if(r.id===id)Object.assign(r,o)});lsSet();render()}}catch(e){say("Could not save.")}}
+document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a[data-call]");if(!a)return;var id=a.getAttribute("data-call");setTimeout(function(){var r=recs.filter(function(x){return x.id===id})[0];if(r)upd(id,{calls:(r.calls||[]).concat([{t:Date.now(),n:""}])})},400)});
+async function callResult(r,k){
+  var cl=(r.calls||[]).slice(),l=cl[cl.length-1];
+  if(l&&!l.n&&Date.now()-l.t<36e5)cl[cl.length-1]={t:l.t,n:k};else cl.push({t:Date.now(),n:k});
+  var dy={"No answer":1,"Call back":1,"Interested":2,"Not interested":null}[k],o={calls:cl,fu:dy==null?"":plus(dy)};
+  if(k==="Interested")o.temp="Hot";if(k==="Not interested")o.temp="Cold";
+  await upd(r.id,o);
+  setTimeout(function(){var x=recs.filter(function(y){return y.id===r.id})[0];if(x){openP(x);pmsg(dy==null?"Saved. Follow-up cleared.":"Saved. Next follow-up set for "+fmt(plus(dy))+".")}},250);
+}
+function trend(){
+  var ms=[],now=new Date(),MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  for(var i=5;i>=0;i--){var x=new Date(now.getFullYear(),now.getMonth()-i,1);ms.push([x.getFullYear()+"-"+("0"+(x.getMonth()+1)).slice(-2),MN[x.getMonth()]])}
+  var c=function(m,f){return recs.filter(function(r){return (r.date||"").slice(0,7)===m&&f(r)}).length};
+  var S=ms.map(function(m){return c(m[0],function(r){return SUB.indexOf(r.status)>-1})}),A=ms.map(function(m){return c(m[0],function(r){return r.status==="Approved"})});
+  var mx=Math.max(1,Math.max.apply(null,S)),g="";
+  ms.forEach(function(m,i){var x=12+i*52,hs=S[i]/mx*80,ha=A[i]/mx*80,t="' font-size='9' text-anchor='middle' fill='currentColor'>";
+    g+="<rect x='"+x+"' y='"+(100-hs)+"' width='19' height='"+hs+"' style='fill:var(--c2)'/><rect x='"+(x+21)+"' y='"+(100-ha)+"' width='19' height='"+ha+"' style='fill:var(--ok)'/><text x='"+(x+9.5)+"' y='"+(97-hs)+t+S[i]+"</text><text x='"+(x+30.5)+"' y='"+(97-ha)+t+A[i]+"</text><text x='"+(x+20)+"' y='114"+t.replace("9","10")+m[1]+"</text>"});
+  return "<strong>Last 6 months</strong><svg viewBox='0 0 324 122' style='width:100%;max-width:420px;display:block;margin:6px 0 4px'>"+g+"</svg><div class='sub' style='margin:0 0 14px'><span style='color:var(--c2)'>\u25a0</span> Submitted &nbsp; <span style='color:var(--ok)'>\u25a0</span> Approved</div>";
+}
+function finder(){
+  var s=num($("bf_s").value),nt=$("bf_n").value,o=$("bf_o"),rl=[];cfg.cr=$("bf_r").value;cfgSave();
+  String(cfg.cr||"").split("\n").forEach(function(l){var m=l.split("=");if(m.length<2||!m[0].trim())return;var p=m[1].split("|"),mn=Number(p[0]);if(isNaN(mn))return;rl.push({c:m[0].trim(),mn:mn,na:(p[1]||"").trim().toLowerCase()})});
+  if(!rl.length){o.innerHTML="<span class='sub'>Add your card rules first (Card=minimum salary).</span>";return}
+  if(s===null){o.innerHTML="";return}
+  var ok=rl.filter(function(x){return s>=x.mn&&(!x.na||x.na===nt)}).map(function(x){return {c:x.c,cm:tbRate({salary:s,card:x.c})}}).sort(function(a,b){return (b.cm==null?-1:b.cm)-(a.cm==null?-1:a.cm)});
+  o.innerHTML=ok.length?"<div><b>Best: "+esc(ok[0].c)+"</b>"+(ok[0].cm!=null?" \u00b7 commission AED "+ok[0].cm.toLocaleString("en-US"):"")+(ok.length>1?"<br><span class='sub'>Also: "+ok.slice(1).map(function(x){return esc(x.c)+(x.cm!=null?" ("+x.cm+")":"")}).join(", ")+"</span>":"")+"</div>":"<div class='sub'>No card in your rules fits this salary.</div>";
+}
+$("bf_r").value=cfg.cr||"";$("bf_s").oninput=finder;$("bf_n").onchange=finder;$("bf_r").oninput=finder;finder();
+$("dsb").onclick=function(){
+  var t=plus(0),calls=0,nw=0,sb=0,ap=0,fd=0;
+  recs.forEach(function(r){(r.calls||[]).forEach(function(c){if(dstr(c.t)===t)calls++});if(r.date===t){nw++;if(SUB.indexOf(r.status)>-1)sb++;if(r.status==="Approved")ap++}if(r.fu&&r.fu<=t)fd++});
+  var tx="Daily summary - "+fmt(t)+" ("+AG+")\nCalls made: "+calls+"\nNew leads: "+nw+"\nSubmitted: "+sb+"\nApproved: "+ap+"\nFollow-ups due: "+fd;
+  $("dsum").innerHTML="<textarea id='dst' rows='6' style='margin-top:8px'>"+esc(tx)+"</textarea><div class='row'><button class='s' id='dsw'>Send on WhatsApp</button><button class='s' id='dsc'>Copy</button></div>";
+  $("dsw").onclick=function(){window.open("https://wa.me/?text="+encodeURIComponent($("dst").value),"_blank","noopener")};
+  $("dsc").onclick=function(){try{navigator.clipboard.writeText($("dst").value);$("tmsg").textContent="Copied."}catch(e){$("dst").select();$("tmsg").textContent="Select the text and copy it."}};
+};
+
+function inS(){var l=arguments;return function(r){return Array.prototype.indexOf.call(l,r.status)>-1}}
+var SFN={sT:["Total",function(){return true}],sS:["Submitted",inS("Submitted","In Process","Approved","Rejected")],sE:["Eligible",function(r){return r.elig==="Eligible"}],sA:["Approved",inS("Approved")],sR:["Rejected",inS("Rejected")],sP:["Pending",inS("Pending","In Process")]};
+var sdId="sT",sdScope="m";
+function showStat(id,scope){
+  sdId=id;sdScope=scope;var d=SFN[id],mo=today().slice(0,7);
+  var all=recs.filter(d[1]).sort(function(a,b){return (b.date||"").localeCompare(a.date||"")||(b.ts||0)-(a.ts||0)});
+  var mon=all.filter(function(r){return (r.date||"").slice(0,7)===mo}),list=scope==="m"?mon:all;
+  $("sdt").textContent=d[0]+" customers";
+  $("sdc").innerHTML="<button class='s' data-sc='m'"+(scope==="m"?" style='font-weight:bold;border-color:var(--pr)'":"")+">This month ("+mon.length+")</button><button class='s' data-sc='a'"+(scope==="a"?" style='font-weight:bold;border-color:var(--pr)'":"")+">All ("+all.length+")</button>";
+  $("sdb").innerHTML=list.length?list.map(function(r){
+    var meta=[r.card,r.bnk,r.company,r.salary?"AED "+Number(r.salary).toLocaleString("en-US"):"",fmt(r.date)].filter(Boolean).map(esc).join(" \u00b7 ");
+    return "<div class='row' style='justify-content:space-between;align-items:flex-start;margin-top:10px;gap:10px;flex-wrap:nowrap'><span style='flex:1;min-width:0'><b>"+esc(r.name)+"</b> <span class='b "+esc((r.status||"").replace(" ","-"))+"'>"+esc(r.status)+"</span><br><span class='sub'>"+meta+"</span></span><button class='s' style='flex:none' data-sv='"+esc(r.id)+"'>View</button></div>"}).join(""):"<div class='sub' style='margin-top:10px'>No customers here yet.</div>";
+  $("sd").style.display="block";$("sd").scrollTop=0;
+}
+Array.prototype.forEach.call(document.querySelectorAll(".st"),function(el){
+  var id=el.getElementsByTagName("b")[0].id;el.setAttribute("role","button");el.tabIndex=0;
+  el.onclick=function(){showStat(id,"m")};
+  el.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();showStat(id,"m")}};
+});
+$("sdc").onclick=function(e){var b=e.target.closest("[data-sc]");if(b)showStat(sdId,b.getAttribute("data-sc"))};
+$("sdb").onclick=function(e){var b=e.target.closest("[data-sv]");if(!b)return;var r=recs.filter(function(x){return x.id===b.getAttribute("data-sv")})[0];if(r)openP(r)};
+$("sdx").onclick=function(){$("sd").style.display="none"};
+
+var dcs=[];
+function drawD(){
+  var t=0;dcs.forEach(function(c){t+=c.lim});
+  $("d_cl").innerHTML=dcs.map(function(c,i){return "<div class='row' style='justify-content:space-between;margin-top:6px'><span>"+esc(c.bank)+" \u00b7 AED "+fm(c.lim)+"</span><button class='s' data-dr='"+i+"'>Remove</button></div>"}).join("")+(dcs.length?"<div class='sub' style='margin-top:6px'>Total card limit AED "+fm(t)+"</div>":"");
+}
+function dbrCalc(){
+  var sal=num($("d_s").value),emi=num($("d_e").value)||0,nl=num($("d_n").value)||0,o=$("d_out");
+  var pl=num($("d_clim").value),cards=dcs.concat(pl?[{bank:$("d_bank").value.trim()||"Card",lim:pl}]:[]),tl=0;
+  cards.forEach(function(c){tl+=c.lim});
+  if(!sal){o.className="";o.textContent="";$("d_tbl").innerHTML="";return}
+  var ob=emi+tl*0.05,d=ob/sal*100,el=elig(sal,d),r1=function(x){return Math.round(x*10)/10};
+  var rows=[["Monthly EMI (AED)",fm(emi),"\u2013",null]];
+  cards.forEach(function(c){rows.push([c.bank+" card limit (AED)",fm(c.lim)+" ("+fm(Math.round(c.lim*0.05))+" a month)","\u2013",null])});
+  rows.push(["Total monthly obligations (AED)",fm(Math.round(ob)),"\u2013",null],["DBR now (%)",r1(d),"50 or below",d<=50],["Maximum new card limit (AED)",fm(el),"5,000 or more",el>=5000]);
+  var need=Math.max(0,Math.ceil(ob-(0.5*sal-250)));
+  if(need>0)rows.push(["Reduce obligations by (AED a month)",fm(need),"0",false]);
+  var ok=d<=50&&el>=5000;
+  if(nl){var d2=(ob+nl*0.05)/sal*100;rows.push(["New card adds (AED a month)",fm(Math.round(nl*0.05)),"\u2013",null]);rows.push(["DBR after new card (%)",r1(d2),"50 or below",d2<=50]);ok=ok&&d2<=50&&nl>=5000}
+  o.className=ok?"Approved":"Rejected";
+  o.textContent=d>50?"DBR is above 50%. Reduce monthly obligations by about AED "+fm(need)+".":el<5000?"Not eligible: the maximum card limit is below AED 5,000.":nl&&!ok?"A new limit of AED "+fm(nl)+" would push DBR above 50%. The maximum is AED "+fm(el)+".":"Eligible. Maximum new card limit about AED "+fm(el)+".";
+  $("d_tbl").innerHTML=tblHtml(rows);
+}
+$("d_add").onclick=function(){var l=num($("d_clim").value);if(!l)return;dcs.push({bank:$("d_bank").value.trim()||"Card "+(dcs.length+1),lim:l});$("d_bank").value="";$("d_clim").value="";drawD();dbrCalc()};
+$("d_cl").onclick=function(e){var b=e.target.closest("[data-dr]");if(!b)return;dcs.splice(Number(b.getAttribute("data-dr")),1);drawD();dbrCalc()};
+["d_s","d_e","d_n","d_bank","d_clim"].forEach(function(i){$(i).oninput=dbrCalc});
+
+init();
+})();
+</script>
+</body>
+</html>
